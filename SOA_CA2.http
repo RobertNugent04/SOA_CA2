@@ -1,0 +1,6 @@
+@SOA_CA2_HostAddress = http://localhost:5225
+
+GET {{SOA_CA2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
