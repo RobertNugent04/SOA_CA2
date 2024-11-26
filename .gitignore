@@ -1,0 +1,12 @@
+# Ignore Visual Studio temporary files, build results, and user-specific files
+
+
+# User-specific files
+.vs/
+
+# Build results
+obj/
+bin/
+
+#NuGet Packages
+packages/
