@@ -20,7 +20,7 @@ namespace SOA_CA2.Models
 
 		[Required]
 		[StringLength(50)] 
-		public string Status { get; set; } 
+		public required string Status { get; set; } 
 
 		[Column(TypeName = "timestamp")]
 		public DateTime Created_At { get; set; } = DateTime.UtcNow; 
