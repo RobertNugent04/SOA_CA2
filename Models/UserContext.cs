@@ -19,6 +19,7 @@ namespace SOA_CA2.Models
 		public DbSet<Post> Posts { get; set; }
 		public DbSet<Comment> Comments { get; set; }
 		public DbSet<Like> Likes { get; set; }
+		public DbSet<Friend> Friend { get; set; }
 
 	}
 }
