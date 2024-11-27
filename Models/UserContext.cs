@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,10 @@ namespace SOA_CA2.Models
 		{
 
 		}
+
+
 		public DbSet<User> Users { get; set; }
-		
+		public DbSet<Post> Posts { get; set; }
+
 	}
 }

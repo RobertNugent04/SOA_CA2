@@ -5,11 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContextPool<UserContext>(
-	options => options.UseMySql(
-		builder.Configuration.GetConnectionString("DBConn"),
-		new MySqlServerVersion(new Version(8, 0, 21))
-	)
+builder.Services.AddDbContextPool<UserContext>(options =>
+	options.UseNpgsql(builder.Configuration.GetConnectionString("DBConn"))
 );
 
 builder.Services.AddControllers();
