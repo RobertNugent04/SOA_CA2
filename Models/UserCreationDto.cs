@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SOA_CA2.Models
+﻿namespace SOA_CA2.Models
 {
 	// Used for creating a new user
 	public class UserCreationDto
