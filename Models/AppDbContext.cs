@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOA_CA2.Models
 {
-	public class UserContext : DbContext
+	public class AppDbContext : DbContext
 	{
-		public UserContext(DbContextOptions<UserContext> options) : base(options)
+		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
 
 		}

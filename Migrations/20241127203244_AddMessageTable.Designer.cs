@@ -11,7 +11,7 @@ using SOA_CA2.Models;
 
 namespace SOA_CA2.Migrations
 {
-    [DbContext(typeof(UserContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20241127203244_AddMessageTable")]
     partial class AddMessageTable
     {
