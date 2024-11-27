@@ -14,22 +14,22 @@ namespace SOA_CA2.Models
 		[Required]
 		[Column(TypeName = "nvarchar(150)")]
 		[StringLength(150, MinimumLength = 2)]
-		public string Full_Name { get; set; }
+		public required string Full_Name { get; set; }
 
 		[Required]
 		[Column(TypeName = "varchar(50)")]
 		[StringLength(50, MinimumLength = 3)]
-		public string Username { get; set; }
+		public required string Username { get; set; }
 
 		[Required]
 		[EmailAddress]
 		[Column(TypeName = "varchar(100)")]
 		[StringLength(100)]
-		public string Email { get; set; }
+		public required string Email { get; set; }
 
 		[Required]
 		[Column(TypeName = "varchar(255)")]
-		public string Password { get; set; }
+		public required string Password { get; set; }
 
 		[Column(TypeName = "nvarchar(500)")]
 		[StringLength(500)]
