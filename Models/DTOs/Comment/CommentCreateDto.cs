@@ -1,7 +1,7 @@
 ﻿namespace SOA_CA2.Models.DTOs.Comment
 {
 	//Used for creating a comment
-	public class CommentForCreationDto
+	public class CommentCreationDto
 	{
 		public required string Content { get; set; }
 
