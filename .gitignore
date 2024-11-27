@@ -10,3 +10,6 @@ bin/
 
 #NuGet Packages
 packages/
+
+#Configuration File
+appsettings.json
