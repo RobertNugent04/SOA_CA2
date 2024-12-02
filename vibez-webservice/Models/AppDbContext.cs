@@ -15,5 +15,7 @@ namespace SOA_CA2.Models
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+
+        public DbSet<Call> Calls { get; set; }
     }
 }

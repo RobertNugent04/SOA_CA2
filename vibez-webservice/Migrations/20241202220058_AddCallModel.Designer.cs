@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SOA_CA2.Models;
@@ -11,9 +12,11 @@ using SOA_CA2.Models;
 namespace SOA_CA2.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20241202220058_AddCallModel")]
+    partial class AddCallModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,48 +24,6 @@ namespace SOA_CA2.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("SOA_CA2.Models.Call", b =>
-                {
-                    b.Property<int>("CallId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CallId"));
-
-                    b.Property<string>("CallStatus")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
-
-                    b.Property<string>("CallType")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<int>("CallerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("EndedAt")
-                        .HasColumnType("timestamp");
-
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("StartedAt")
-                        .HasColumnType("timestamp");
-
-                    b.HasKey("CallId");
-
-                    b.HasIndex("CallerId");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.ToTable("Calls");
-                });
 
             modelBuilder.Entity("SOA_CA2.Models.Comment", b =>
                 {
@@ -304,25 +265,6 @@ namespace SOA_CA2.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("SOA_CA2.Models.Call", b =>
-                {
-                    b.HasOne("SOA_CA2.Models.User", "Caller")
-                        .WithMany()
-                        .HasForeignKey("CallerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SOA_CA2.Models.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Caller");
-
-                    b.Navigation("Receiver");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.Comment", b =>
