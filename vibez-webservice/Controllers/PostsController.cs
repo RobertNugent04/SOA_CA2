@@ -46,7 +46,7 @@ namespace SOA_CA2.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPost(int id, Post post)
         {
-            if (id != post.Post_ID)
+            if (id != post.PostId)
             {
                 return BadRequest();
             }
@@ -80,7 +80,7 @@ namespace SOA_CA2.Controllers
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPost", new { id = post.Post_ID }, post);
+            return CreatedAtAction("GetPost", new { id = post.PostId }, post);
         }
 
         // DELETE: api/Posts/5
@@ -101,7 +101,7 @@ namespace SOA_CA2.Controllers
 
         private bool PostExists(int id)
         {
-            return _context.Posts.Any(e => e.Post_ID == id);
+            return _context.Posts.Any(e => e.PostId == id);
         }
     }
 }
