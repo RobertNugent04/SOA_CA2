@@ -6,6 +6,10 @@
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  position: fixed;
+  top: 0px;
+  width: 98%;
+  z-index: 1;
 }
 
 .navbar-brand {
