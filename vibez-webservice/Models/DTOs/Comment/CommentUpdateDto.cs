@@ -1,8 +1,13 @@
 ﻿namespace SOA_CA2.Models.DTOs.Comment
 {
-	// Used for updating a comment
-	public class CommentUpdateDto
-	{
-		public string? Content { get; set; }
-	}
+    /// <summary>
+    /// DTO used for updating an existing comment.
+    /// </summary>
+    public class CommentUpdateDto
+    {
+        /// <summary>
+        /// The updated content of the comment.
+        /// </summary>
+        public string? Content { get; set; }
+    }
 }
