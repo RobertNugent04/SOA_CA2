@@ -23,6 +23,11 @@ namespace SOA_CA2.Models
         public int UserId { get; set; }
 
         /// <summary>
+        /// Navigation property for the user who created the post.
+        /// </summary>
+        public User User { get; set; }
+
+        /// <summary>
         /// The content of the post.
         /// </summary>
         [Required]
