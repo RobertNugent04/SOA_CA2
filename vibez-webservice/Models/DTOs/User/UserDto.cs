@@ -8,17 +8,17 @@
         /// <summary>
         /// The unique identifier of the user.
         /// </summary>
-        public int User_ID { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// The full name of the user.
         /// </summary>
-        public required string Full_Name { get; set; }
+        public required string FullName { get; set; }
 
         /// <summary>
         /// The username of the user.
         /// </summary>
-        public required string Username { get; set; }
+        public required string UserName { get; set; }
 
         /// <summary>
         /// The email address of the user.
@@ -38,7 +38,7 @@
         /// <summary>
         /// The date and time when the user account was created.
         /// </summary>
-        public DateTime Created_At { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Indicates whether the user's account is active.

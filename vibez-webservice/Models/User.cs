@@ -13,7 +13,7 @@ namespace SOA_CA2.Models
         /// </summary>
         [Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public int User_ID { get; set; }
+		public int UserId { get; set; }
 
         /// <summary>
         /// The full name of the user.
@@ -21,7 +21,7 @@ namespace SOA_CA2.Models
         [Required]
 		[Column(TypeName = "varchar(150)")] 
 		[StringLength(150, MinimumLength = 2)]
-		public required string Full_Name { get; set; }
+		public required string FullName { get; set; }
 
         /// <summary>
         /// The unique username chosen by the user.
@@ -29,7 +29,7 @@ namespace SOA_CA2.Models
         [Required]
 		[Column(TypeName = "varchar(50)")] 
 		[StringLength(50, MinimumLength = 3)]
-		public required string Username { get; set; }
+		public required string UserName { get; set; }
 
         /// <summary>
         /// The email address of the user.
@@ -70,12 +70,12 @@ namespace SOA_CA2.Models
         /// The date and time when the user account was created (in UTC).
         /// </summary>
         [Column(TypeName = "timestamptz")] 
-		public DateTime Created_At { get; set; } = DateTime.UtcNow;
+		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// The date and time when the user account was last updated (in UTC).
         /// </summary>
 		[Column(TypeName = "timestamptz")] 
-		public DateTime? Updated_At { get; set; }
+		public DateTime? UpdatedAt { get; set; }
 	}
 }

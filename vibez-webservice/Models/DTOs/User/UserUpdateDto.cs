@@ -11,7 +11,7 @@ namespace SOA_CA2.Models.DTOs.User
         /// The new full name of the user.
         /// </summary>
         [StringLength(150, MinimumLength = 2)]
-        public string? Full_Name { get; set; }
+        public string? FullName { get; set; }
 
         /// <summary>
         /// A new biography or description for the user.

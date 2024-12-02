@@ -12,14 +12,14 @@ namespace SOA_CA2.Models.DTOs.User
         /// </summary>
         [Required]
         [StringLength(150, MinimumLength = 2)]
-        public required string Full_Name { get; set; }
+        public required string FullName { get; set; }
 
         /// <summary>
         /// The desired username.
         /// </summary>
         [Required]
         [StringLength(50, MinimumLength = 3)]
-        public required string Username { get; set; }
+        public required string UserName { get; set; }
 
         /// <summary>
         /// The email address of the user.

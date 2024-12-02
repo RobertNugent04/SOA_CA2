@@ -11,7 +11,7 @@ namespace SOA_CA2.Models.DTOs.User
         /// The username or email used for logging in.
         /// </summary>
         [Required]
-        public required string UsernameOrEmail { get; set; }
+        public required string UserNameOrEmail { get; set; }
 
         /// <summary>
         /// The user's password.
