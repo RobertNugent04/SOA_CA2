@@ -77,5 +77,50 @@ namespace SOA_CA2.Models
         /// </summary>
 		[Column(TypeName = "timestamptz")] 
 		public DateTime? UpdatedAt { get; set; }
-	}
+
+        /// <summary>
+        /// Navigation property for the posts created by the user.
+        /// </summary>
+        public ICollection<Post> Posts { get; set; }
+
+        /// <summary>
+        /// Navigation property for the likes given by the user.
+        /// </summary>
+        public ICollection<Like> Likes { get; set; }
+
+        /// <summary>
+        /// Navigation property for the comments made by the user.
+        /// </summary>
+        public ICollection<Comment> Comments { get; set; }
+
+        /// <summary>
+        /// Navigation property for the friendships of the user.
+        /// </summary>
+        public ICollection<Friendship> Friendships { get; set; }
+
+        /// <summary>
+        /// Navigation property for the messages sent by the user.
+        /// </summary>
+        public ICollection<Message> MessagesSent { get; set; }
+
+        /// <summary>
+        /// Navigation property for the messages received by the user.
+        /// </summary>
+        public ICollection<Message> MessagesReceived { get; set; }
+
+        /// <summary>
+        /// Navigation property for the notifications received by the user.
+        /// </summary>
+        public ICollection<Notification> Notifications { get; set; }
+
+        /// <summary>
+        /// Navigation property for the calls made by the user.
+        /// </summary>
+        public ICollection<Call> CallsMade { get; set; }
+
+        /// <summary>
+        /// Navigation property for the calls received by the user.
+        /// </summary>
+        public ICollection<Call> CallsReceived { get; set; }
+    }
 }

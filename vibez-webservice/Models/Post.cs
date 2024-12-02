@@ -53,5 +53,14 @@ namespace SOA_CA2.Models
         [Column(TypeName = "timestamp")]
         public DateTime? UpdatedAt { get; set; }
 
+        /// <summary>
+        /// Navigation property for the likes associated with the post.
+        /// </summary>
+        public ICollection<Like> Likes { get; set; }
+
+        /// <summary>
+        /// Navigation property for the comments associated with the post.
+        /// </summary>
+        public ICollection<Comment> Comments { get; set; }
     }
 }
