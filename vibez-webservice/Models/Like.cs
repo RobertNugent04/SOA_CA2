@@ -4,21 +4,46 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SOA_CA2.Models
 {
-	public class Like
-	{
-		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public int Like_ID { get; set; }
+    /// <summary>
+    /// Represents a 'like' given by a user to a post in the Vibez application.
+    /// </summary>
+    public class Like
+    {
+        /// <summary>
+        /// Primary key for the Like entity.
+        /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int LikeId { get; set; }
 
-		[Required]
-		[ForeignKey("Post")] 
-		public int Post_ID { get; set; } 
+        /// <summary>
+        /// Foreign key referencing the Post that was liked.
+        /// </summary>
+        [Required]
+        [ForeignKey("Post")]
+        public int PostId { get; set; }
 
-		[Required]
-		[ForeignKey("User")]
-		public int User_ID { get; set; } 
+        /// <summary>
+        /// Navigation property for the Post that was liked.
+        /// </summary>
+        public Post Post { get; set; }
 
-		[Column(TypeName = "timestamp")]
-		public DateTime Created_At { get; set; } = DateTime.UtcNow; 
-	}
+        /// <summary>
+        /// Foreign key referencing the User who liked the post.
+        /// </summary>
+        [Required]
+        [ForeignKey("User")]
+        public int UserId { get; set; }
+
+        /// <summary>
+        /// Navigation property for the User who liked the post.
+        /// </summary>
+        public User User { get; set; }
+
+        /// <summary>
+        /// The timestamp when the like was created - UTC.
+        /// </summary>
+        [Column(TypeName = "timestamp")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }
