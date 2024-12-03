@@ -15,6 +15,7 @@ namespace SOA_CA2.Services
         private readonly IMapper _mapper;
         private readonly IJwtGenerator _jwtGenerator;
         private readonly IEmailService _emailService;
+        private readonly IOtpCacheManager _otpCacheManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
@@ -23,12 +24,14 @@ namespace SOA_CA2.Services
             IUserRepository userRepository,
             IMapper mapper,
             IJwtGenerator jwtGenerator,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOtpCacheManager otpCacheManager)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _jwtGenerator = jwtGenerator;
             _emailService = emailService;
+            _otpCacheManager = otpCacheManager;
         }
 
         /// <inheritdoc />
@@ -97,15 +100,36 @@ namespace SOA_CA2.Services
         }
 
         /// <inheritdoc />
-        public async Task ResetPasswordAsync(string email, string newPassword)
+        public async Task RequestPasswordResetAsync(string email)
         {
-            // Find user by email.
             User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
-            if (user == null) throw new ArgumentException("Email not found.");
+            if (user == null)
+            {
+                throw new ArgumentException("Email not found.");
+            }
 
-            // Update password.
+            string otp = OtpGenerator.GenerateOtp();
+            _otpCacheManager.StoreOtp(user.UserId, otp, TimeSpan.FromMinutes(15));
+            await _emailService.SendOtpEmailAsync(email, otp);
+        }
+
+        /// <inheritdoc />
+        public async Task VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
+        {
+            User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
+            if (user == null)
+            {
+                throw new ArgumentException("Email not found.");
+            }
+
+            if (!_otpCacheManager.ValidateOtp(user.UserId, otp))
+            {
+                throw new UnauthorizedAccessException("Invalid or expired OTP.");
+            }
+
             user.PasswordHash = PasswordHasher.HashPassword(newPassword);
             await _userRepository.SaveChangesAsync();
+            _otpCacheManager.InvalidateOtp(user.UserId);
         }
     }
 }

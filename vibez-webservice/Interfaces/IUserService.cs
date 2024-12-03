@@ -28,8 +28,13 @@ namespace SOA_CA2.Interfaces
         Task<UserDTO?> GetUserByIdAsync(int id);
 
         /// <summary>
-        /// Resets a user's password.
+        /// Requests a password reset for a user.
         /// </summary>
-        Task ResetPasswordAsync(string email, string newPassword);
+        Task RequestPasswordResetAsync(string email);
+
+        /// <summary>
+        /// Verifies an OTP and resets the user's password.
+        /// </summary>
+        Task VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword);
     }
 }
