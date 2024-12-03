@@ -13,6 +13,9 @@ namespace SOA_CA2.Middleware
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        /// Initializes the middleware with the request delegate and configuration.
+        /// </summary>
         public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
         {
             _next = next;
@@ -20,10 +23,8 @@ namespace SOA_CA2.Middleware
         }
 
         /// <summary>
-        /// Method to validate JWT tokens.
+        /// Validates the JWT token and attaches the claims to the HttpContext.
         /// </summary>
-        /// <param name="context">The HTTP context.</param>
-        /// <returns>Returns the task object representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
             string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -35,19 +36,25 @@ namespace SOA_CA2.Middleware
                     JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
                     byte[] key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
-                    tokenHandler.ValidateToken(token, new TokenValidationParameters
+                    TokenValidationParameters parameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
-                    }, out _);
+                        ValidateAudience = false,
+                    };
+
+                    System.Security.Claims.ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(token, parameters, out _);
+                    // Log claims for debugging
+                    foreach (var claim in claimsPrincipal.Claims)
+                    {
+                        Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
+                    }
+                    context.Items["User"] = claimsPrincipal;
                 }
                 catch
                 {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Invalid Token");
-                    return;
+                    // Token validation failed, do nothing
                 }
             }
 

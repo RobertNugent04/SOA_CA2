@@ -205,5 +205,11 @@ namespace SOA_CA2.Services
             // Map to DTOs.
             return users.Select(user => _mapper.Map<UserDTO>(user));
         }
+
+        /// <inheritdoc />
+        public async Task DeleteAccountAsync(int userId)
+        {
+            await _unitOfWork.Users.DeleteUserAsync(userId);
+        }
     }
 }

@@ -13,3 +13,6 @@ packages/
 
 #Configuration File
 appsettings.json
+
+#Image Files
+wwwroot/profile-pictures/

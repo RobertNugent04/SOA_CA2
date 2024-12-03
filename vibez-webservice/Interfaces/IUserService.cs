@@ -51,5 +51,10 @@ namespace SOA_CA2.Interfaces
         /// Searches for users by username or name.
         /// </summary>
         Task<IEnumerable<UserDTO>> SearchUsersAsync(string query);
+
+        /// <summary>
+        /// Deletes the currently authenticated user's account.
+        /// </summary>
+        Task DeleteAccountAsync(int userId);
     }
 }
