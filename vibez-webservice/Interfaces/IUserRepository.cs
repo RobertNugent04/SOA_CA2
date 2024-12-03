@@ -33,6 +33,11 @@ namespace SOA_CA2.Interfaces
         Task AddUserAsync(User user);
 
         /// <summary>
+        /// Searches for users by username or full name.
+        /// </summary>
+        Task<IEnumerable<User>> SearchUsersAsync(string query);
+
+        /// <summary>
         /// Saves changes to the database.
         /// </summary>
         Task SaveChangesAsync();

@@ -47,6 +47,14 @@ namespace SOA_CA2.Repositories
             await _context.Users.AddAsync(user);
 
         /// <inheritdoc />
+        public async Task<IEnumerable<User>> SearchUsersAsync(string query)
+        {
+            return await _context.Users
+                .Where(u => EF.Functions.ILike(u.UserName, $"%{query}%") || EF.Functions.ILike(u.FullName, $"%{query}%"))
+                .ToListAsync();
+        }
+
+        /// <inheritdoc />
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
     }

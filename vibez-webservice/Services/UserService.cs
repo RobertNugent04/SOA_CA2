@@ -2,6 +2,7 @@
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.User;
+using SOA_CA2.Repositories;
 using SOA_CA2.Utilities;
 
 namespace SOA_CA2.Services
@@ -151,6 +152,43 @@ namespace SOA_CA2.Services
             user.PasswordHash = PasswordHasher.HashPassword(newPassword);
             await _unitOfWork.Users.SaveChangesAsync();
             _otpCacheManager.InvalidateOtp(user.UserId);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<string>> SuggestUsernamesAsync(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new ArgumentException("Full name must be provided.");
+
+            // Extract name parts.
+            string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string baseUsername = string.Join("", nameParts).ToLower();
+
+            // Generate a list of potential usernames using the split full name and numbers
+            List<string> suggestions = new List<string>();
+            for (int i = 1; i <= 5; i++)
+            {
+                string suggestion = $"{baseUsername}{i}";
+                if (!await _unitOfWork.Users.UserNameExistsAsync(suggestion))
+                {
+                    suggestions.Add(suggestion);
+                }
+            }
+
+            return suggestions;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<UserDTO>> SearchUsersAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Enumerable.Empty<UserDTO>();
+
+            // Search for users by name or username.
+            IEnumerable<User> users = await _unitOfWork.Users.SearchUsersAsync(query);
+
+            // Map to DTOs.
+            return users.Select(user => _mapper.Map<UserDTO>(user));
         }
     }
 }

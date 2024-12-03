@@ -122,5 +122,32 @@ namespace SOA_CA2.Controllers
             await _userService.VerifyOtpAndResetPasswordAsync(request.Email, request.Otp, request.NewPassword);
             return Ok(new { Message = "Password reset successful." });
         }
+
+        /// <summary>
+        /// Suggests unique usernames based on the user's full name.
+        /// </summary>
+        [HttpGet("suggest-usernames")]
+        public async Task<IActionResult> SuggestUsernames([FromQuery] string fullName)
+        {
+            try
+            {
+                IEnumerable<string> suggestions = await _userService.SuggestUsernamesAsync(fullName);
+                return Ok(suggestions);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Searches for users by username or name.
+        /// </summary>
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers([FromQuery] string query)
+        {
+            IEnumerable<UserDTO> users = await _userService.SearchUsersAsync(query);
+            return Ok(users);
+        }
     }
 }
