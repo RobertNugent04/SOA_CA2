@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SOA_CA2.Models;
 
-namespace SOA_CA2.Models
+namespace SOA_CA2.Infrastructure
 {
     public class AppDbContext : DbContext
     {

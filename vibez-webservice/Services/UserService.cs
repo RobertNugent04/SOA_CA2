@@ -11,7 +11,7 @@ namespace SOA_CA2.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IJwtGenerator _jwtGenerator;
         private readonly IEmailService _emailService;
@@ -21,13 +21,13 @@ namespace SOA_CA2.Services
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
         public UserService(
-            IUserRepository userRepository,
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IJwtGenerator jwtGenerator,
             IEmailService emailService,
             IOtpCacheManager otpCacheManager)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _jwtGenerator = jwtGenerator;
             _emailService = emailService;
@@ -38,8 +38,8 @@ namespace SOA_CA2.Services
         public async Task<bool> RegisterAsync(UserCreationDto dto)
         {
             // Check if email or username exists.
-            if (await _userRepository.UserNameExistsAsync(dto.UserName) ||
-                await _userRepository.EmailExistsAsync(dto.Email))
+            if (await _unitOfWork.Users.UserNameExistsAsync(dto.UserName) ||
+                await _unitOfWork.Users.EmailExistsAsync(dto.Email))
             {
                 throw new ArgumentException("Username or email already exists.");
             }
@@ -51,8 +51,8 @@ namespace SOA_CA2.Services
             user.PasswordHash = PasswordHasher.HashPassword(dto.Password);
 
             // Add the user to the database.
-            await _userRepository.AddUserAsync(user);
-            await _userRepository.SaveChangesAsync();
+            await _unitOfWork.Users.AddUserAsync(user);
+            await _unitOfWork.Users.SaveChangesAsync();
 
             // Send OTP to verify email.
             string otp = OtpGenerator.GenerateOtp();
@@ -65,7 +65,7 @@ namespace SOA_CA2.Services
         public async Task VerifyOtpAsync(string email, string otp)
         {
             // Find the user by email.
-            User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
+            User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(email);
             if (user == null) throw new ArgumentException("User not found.");
 
             // Validate the OTP using the OtpCacheManager.
@@ -76,7 +76,7 @@ namespace SOA_CA2.Services
 
             // Mark the user as verified
             user.IsActive = true;
-            await _userRepository.SaveChangesAsync();
+            await _unitOfWork.Users.SaveChangesAsync();
 
             // Invalidate the OTP after successful verification.
             _otpCacheManager.InvalidateOtp(user.UserId);
@@ -86,7 +86,7 @@ namespace SOA_CA2.Services
         public async Task<string?> LoginAsync(UserLoginDto dto)
         {
             // Find user by username or email.
-            User? user = await _userRepository.FindByUsernameOrEmailAsync(dto.UserNameOrEmail);
+            User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(dto.UserNameOrEmail);
             if (user == null || !PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash))
             {
                 throw new UnauthorizedAccessException("Invalid credentials.");
@@ -100,7 +100,7 @@ namespace SOA_CA2.Services
         public async Task UpdateUserProfileAsync(int userId, UserUpdateDto dto)
         {
             // Find user by ID.
-            User user = await _userRepository.GetUserByIdAsync(userId)
+            User user = await _unitOfWork.Users.GetUserByIdAsync(userId)
                        ?? throw new ArgumentException("User not found.");
 
             // Update properties.
@@ -109,21 +109,21 @@ namespace SOA_CA2.Services
             if (!string.IsNullOrWhiteSpace(dto.ProfilePictureUrl)) user.ProfilePictureUrl = dto.ProfilePictureUrl;
 
             // Save changes.
-            await _userRepository.SaveChangesAsync();
+            await _unitOfWork.Users.SaveChangesAsync();
         }
 
         /// <inheritdoc />
         public async Task<UserDTO?> GetUserByIdAsync(int id)
         {
             // Retrieve user and map to DTO.
-            User? user = await _userRepository.GetUserByIdAsync(id);
+            User? user = await _unitOfWork.Users.GetUserByIdAsync(id);
             return user != null ? _mapper.Map<UserDTO>(user) : null;
         }
 
         /// <inheritdoc />
         public async Task RequestPasswordResetAsync(string email)
         {
-            User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
+            User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(email);
             if (user == null)
             {
                 throw new ArgumentException("Email not found.");
@@ -137,7 +137,7 @@ namespace SOA_CA2.Services
         /// <inheritdoc />
         public async Task VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
         {
-            User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
+            User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(email);
             if (user == null)
             {
                 throw new ArgumentException("Email not found.");
@@ -149,7 +149,7 @@ namespace SOA_CA2.Services
             }
 
             user.PasswordHash = PasswordHasher.HashPassword(newPassword);
-            await _userRepository.SaveChangesAsync();
+            await _unitOfWork.Users.SaveChangesAsync();
             _otpCacheManager.InvalidateOtp(user.UserId);
         }
     }

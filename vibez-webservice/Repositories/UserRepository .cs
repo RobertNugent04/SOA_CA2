@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SOA_CA2.Infrastructure;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 
