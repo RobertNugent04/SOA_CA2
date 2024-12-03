@@ -1,4 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using SOA_CA2.Infrastructure;
+using SOA_CA2;
+using SOA_CA2.Interfaces;
+using SOA_CA2.Middleware;
+using SOA_CA2.Repositories;
+using SOA_CA2.Services;
+using SOA_CA2.Utilities;
 using SOA_CA2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +15,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextPool<AppDbContext>(options =>
 	options.UseNpgsql(builder.Configuration.GetConnectionString("DBConn"))
 );
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Add Scoped Dependencies
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<IOtpCacheManager, OtpCacheManager>(); // Singleton for caching OTPs
+
+// Add Middleware Services
+builder.Services.AddTransient<ErrorHandlingMiddleware>();
+builder.Services.AddTransient<JwtMiddleware>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -22,6 +44,10 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+// Add custom middleware for JWT and Error Handling
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<JwtMiddleware>();
 
 app.UseHttpsRedirection();
 
