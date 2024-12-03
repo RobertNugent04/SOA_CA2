@@ -54,6 +54,19 @@ namespace SOA_CA2.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc/>
+        public async Task DeleteUserAsync(int id)
+        {
+            User? user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                throw new ArgumentException($"User with ID {id} not found.");
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
         /// <inheritdoc />
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();

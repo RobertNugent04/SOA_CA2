@@ -17,7 +17,8 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 );
 
 // Add AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Add Scoped Dependencies
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

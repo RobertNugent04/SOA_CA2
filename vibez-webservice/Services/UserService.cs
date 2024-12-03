@@ -38,33 +38,48 @@ namespace SOA_CA2.Services
         /// <inheritdoc />
         public async Task<bool> RegisterAsync(UserCreationDto dto)
         {
-            // Check if email or username exists.
-            if (await _unitOfWork.Users.UserNameExistsAsync(dto.UserName) ||
-                await _unitOfWork.Users.EmailExistsAsync(dto.Email))
+            User? existingUser = await _unitOfWork.Users.FindByUsernameOrEmailAsync(dto.Email);
+            if (existingUser != null)
             {
-                throw new ArgumentException("Username or email already exists.");
+                if (!existingUser.IsActive)
+                {
+                    // Check if the OTP has expired
+                    if (!_otpCacheManager.HasValidOtp(existingUser.UserId))
+                    {
+                        // Delete unverified user
+                        await _unitOfWork.Users.DeleteUserAsync(existingUser.UserId);
+                        await _unitOfWork.Users.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("An unverified account already exists. Please verify your account or wait for the OTP to expire.");
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Username or email already exists.");
+                }
             }
 
-            // Map DTO to User entity.
+            // Proceed with new registration
             User user = _mapper.Map<User>(dto);
-
-            // Hash the password.
             user.PasswordHash = PasswordHasher.HashPassword(dto.Password);
-
-            // Add the user to the database.
             await _unitOfWork.Users.AddUserAsync(user);
             await _unitOfWork.Users.SaveChangesAsync();
 
-            // Send OTP to verify email.
+            // Generate and send OTP
             string otp = OtpGenerator.GenerateOtp();
+            _otpCacheManager.StoreOtp(user.UserId, otp, TimeSpan.FromMinutes(15));
             await _emailService.SendOtpEmailAsync(dto.Email, otp);
 
             return true;
         }
 
+
         /// <inheritdoc />
         public async Task VerifyOtpAsync(string email, string otp)
         {
+            Console.WriteLine("Verifying OTP");
             // Find the user by email.
             User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(email);
             if (user == null) throw new ArgumentException("User not found.");

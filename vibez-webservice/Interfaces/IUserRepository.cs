@@ -38,6 +38,11 @@ namespace SOA_CA2.Interfaces
         Task<IEnumerable<User>> SearchUsersAsync(string query);
 
         /// <summary>
+        /// Delete a user from the database.
+        /// </summary>
+        Task DeleteUserAsync(int id);
+
+        /// <summary>
         /// Saves changes to the database.
         /// </summary>
         Task SaveChangesAsync();
