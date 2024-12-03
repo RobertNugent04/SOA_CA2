@@ -2,7 +2,7 @@
 import React from 'react';
 import { Posts } from './features/posts/Posts.tsx';
 import { Navbar } from './features/navbar/Navbar.tsx';
-import { Messages } from './features/messages/MessageTab.tsx';
+import { MessageTab } from './features/messageTab/MessageTab.tsx';
 
 export const HomeRoute: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ export const HomeRoute: React.FC = () => {
           <Posts />
         </div>
         <div className="messages-container">
-          <Messages />
+          <MessageTab />
         </div>
       </div>
     </div>

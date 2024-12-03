@@ -33,6 +33,10 @@
     padding: 1rem;
     margin-bottom: 1rem;
   }
+
+  .message-item:hover {
+    cursor: pointer;
+  }
   
   .message-profile-pic {
     width: 40px;
