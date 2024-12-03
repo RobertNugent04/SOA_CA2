@@ -98,16 +98,16 @@ namespace SOA_CA2.Services
         }
 
         /// <inheritdoc />
-        public async Task UpdateUserProfileAsync(int userId, UserUpdateDto dto)
+        public async Task UpdateUserProfileAsync(int userId, UserUpdateDto dto, string? profilePicturePath)
         {
             // Find user by ID.
             User user = await _unitOfWork.Users.GetUserByIdAsync(userId)
                        ?? throw new ArgumentException("User not found.");
 
-            // Update properties.
+            // Update user profile information.
             if (!string.IsNullOrWhiteSpace(dto.FullName)) user.FullName = dto.FullName;
             if (!string.IsNullOrWhiteSpace(dto.Bio)) user.Bio = dto.Bio;
-            if (!string.IsNullOrWhiteSpace(dto.ProfilePictureUrl)) user.ProfilePictureUrl = dto.ProfilePictureUrl;
+            if (!string.IsNullOrWhiteSpace(profilePicturePath)) user.ProfilePicturePath = profilePicturePath;
 
             // Save changes.
             await _unitOfWork.Users.SaveChangesAsync();

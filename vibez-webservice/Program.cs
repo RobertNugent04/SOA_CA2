@@ -27,10 +27,6 @@ builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IOtpCacheManager, OtpCacheManager>(); // Singleton for caching OTPs
 
-// Add Middleware Services
-builder.Services.AddTransient<ErrorHandlingMiddleware>();
-builder.Services.AddTransient<JwtMiddleware>();
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -54,5 +50,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Enable static files for the profile picture uploads
+app.UseStaticFiles();
 
 app.Run();

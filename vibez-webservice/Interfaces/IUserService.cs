@@ -25,7 +25,7 @@ namespace SOA_CA2.Interfaces
         /// <summary>
         /// Updates user profile information.
         /// </summary>
-        Task UpdateUserProfileAsync(int userId, UserUpdateDto dto);
+        Task UpdateUserProfileAsync(int userId, UserUpdateDto dto, string? profilePicturePath);
 
         /// <summary>
         /// Retrieves user details by their unique identifier.

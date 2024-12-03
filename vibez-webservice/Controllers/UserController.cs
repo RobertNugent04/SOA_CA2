@@ -75,14 +75,50 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Updates the profile of an existing user.
+        /// Updates the profile of an existing user, including profile picture upload with validation.
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProfile(int id, UserUpdateDto dto)
+        public async Task<IActionResult> UpdateProfile(int id, [FromForm] UserUpdateDto dto)
         {
             try
             {
-                await _userService.UpdateUserProfileAsync(id, dto);
+                string? profilePicturePath = null;
+
+                // Handle profile picture upload if present.
+                if (dto.ProfilePicture != null)
+                {
+                    // Validate file type.
+                    string[] allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    string fileExtension = Path.GetExtension(dto.ProfilePicture.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        return BadRequest(new { Error = "Invalid file type. Only .jpg, .jpeg, .png, and .gif are allowed." });
+                    }
+
+                    // Validate file size (max 5MB).
+                    const long maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (dto.ProfilePicture.Length > maxFileSize)
+                    {
+                        return BadRequest(new { Error = "File size exceeds the maximum limit of 5MB." });
+                    }
+
+                    // Save the file to the server.
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile-pictures");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await dto.ProfilePicture.CopyToAsync(fileStream);
+                    }
+
+                    profilePicturePath = $"/profile-pictures/{uniqueFileName}";
+                }
+
+                await _userService.UpdateUserProfileAsync(id, dto, profilePicturePath);
                 return Ok(new { Message = "Profile updated successfully." });
             }
             catch (ArgumentException ex)
