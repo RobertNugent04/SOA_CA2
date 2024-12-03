@@ -13,6 +13,11 @@ namespace SOA_CA2.Interfaces
         Task<bool> RegisterAsync(UserCreationDto dto);
 
         /// <summary>
+        /// Verifies an OTP for a user.
+        /// </summary>
+        Task VerifyOtpAsync(string email, string otp);
+
+        /// <summary>
         /// Authenticates a user and generates a JWT token.
         /// </summary>
         Task<string?> LoginAsync(UserLoginDto dto);

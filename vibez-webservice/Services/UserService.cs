@@ -62,6 +62,27 @@ namespace SOA_CA2.Services
         }
 
         /// <inheritdoc />
+        public async Task VerifyOtpAsync(string email, string otp)
+        {
+            // Find the user by email.
+            User? user = await _userRepository.FindByUsernameOrEmailAsync(email);
+            if (user == null) throw new ArgumentException("User not found.");
+
+            // Validate the OTP using the OtpCacheManager.
+            if (!_otpCacheManager.ValidateOtp(user.UserId, otp))
+            {
+                throw new UnauthorizedAccessException("Invalid or expired OTP.");
+            }
+
+            // Mark the user as verified
+            user.IsActive = true;
+            await _userRepository.SaveChangesAsync();
+
+            // Invalidate the OTP after successful verification.
+            _otpCacheManager.InvalidateOtp(user.UserId);
+        }
+
+        /// <inheritdoc />
         public async Task<string?> LoginAsync(UserLoginDto dto)
         {
             // Find user by username or email.
