@@ -1,5 +1,5 @@
 import React from 'react';
-import './messages.css';
+import './messageTab.css';
 
 export const Messages = () => {
   const messages = [

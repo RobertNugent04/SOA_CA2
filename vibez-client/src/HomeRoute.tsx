@@ -2,7 +2,7 @@
 import React from 'react';
 import { Posts } from './features/posts/Posts.tsx';
 import { Navbar } from './features/navbar/Navbar.tsx';
-import { Messages } from './features/messages/Messages.tsx';
+import { Messages } from './features/messages/MessageTab.tsx';
 
 export const HomeRoute: React.FC = () => {
   return (
