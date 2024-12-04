@@ -57,3 +57,13 @@
   margin-left: 0.5rem;
   font-size: 1rem;
 }
+
+.navbar-profile-pic{
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+  margin-left: 15px;
+  margin-top: 5px;
+}
