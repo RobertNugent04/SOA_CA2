@@ -17,6 +17,8 @@
 
         IMessageRepository Messages { get; }
 
+        INotificationRepository Notifications { get; }
+
         Task SaveChangesAsync();
     }
 }
