@@ -149,6 +149,25 @@ namespace SOA_CA2.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<Post>> GetAllPostsByUserIdAsync(int userId)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all posts for user ID: {UserId}.", userId);
+                return await _context.Posts
+                    .Where(p => p.UserId == userId)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching all posts for user ID: {UserId}.", userId);
+                throw;
+            }
+        }
+
+
+        /// <inheritdoc />
         public async Task SaveChangesAsync()
         {
             try

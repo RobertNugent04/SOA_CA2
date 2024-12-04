@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
+using SOA_CA2.Models.DTOs.Post;
 using SOA_CA2.Models.DTOs.User;
+using SOA_CA2.Models.DTOs.Friendship;
 using SOA_CA2.Repositories;
 using SOA_CA2.Utilities;
 
@@ -326,6 +328,38 @@ namespace SOA_CA2.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting account for user ID: {UserId}", userId);
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<UserProfileDto?> GetUserProfileAsync(int userId)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving profile for user ID: {UserId}", userId);
+
+                // Fetch the main user
+                User? user = await _unitOfWork.Users.GetUserByIdAsync(userId);
+                if (user == null) return null;
+
+                // Fetch posts created by the user
+                IEnumerable<Post> userPosts = await _unitOfWork.Posts.GetAllPostsByUserIdAsync(userId);
+
+                // Fetch friends as users
+                IEnumerable<User> userFriends = await _unitOfWork.Friendships.GetAcceptedFriendsAsync(userId);
+
+                // Map the data to the UserProfileDto
+                return new UserProfileDto
+                {
+                    User = _mapper.Map<UserDTO>(user),
+                    Posts = userPosts.Select(post => _mapper.Map<PostDTO>(post)).ToList(),
+                    Friends = userFriends.Select(friend => _mapper.Map<UserDTO>(friend)).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving profile for user ID: {UserId}", userId);
                 throw;
             }
         }

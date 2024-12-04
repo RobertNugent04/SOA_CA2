@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Comment;
+using SOA_CA2.Models.DTOs.Notification;
 
 namespace SOA_CA2.Services
 {
@@ -14,15 +16,17 @@ namespace SOA_CA2.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<CommentService> _logger;
+        private readonly INotificationService _notificationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentService"/> class.
         /// </summary>
-        public CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger)
+        public CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         /// <inheritdoc />
@@ -41,12 +45,20 @@ namespace SOA_CA2.Services
             }
         }
 
-        /// <inheritdoc />
+        //// <inheritdoc />
         public async Task CreateCommentAsync(int userId, CommentCreationDto dto)
         {
             try
             {
                 _logger.LogInformation("Creating a comment for post ID: {PostId}", dto.PostId);
+
+                // Retrieve the post to get the owner
+                Post? post = await _unitOfWork.Posts.GetPostByIdAsync(dto.PostId);
+                if (post == null)
+                {
+                    _logger.LogWarning("Post not found for post ID: {PostId}", dto.PostId);
+                    throw new ArgumentException("Post not found.");
+                }
 
                 Comment comment = new Comment
                 {
@@ -60,6 +72,18 @@ namespace SOA_CA2.Services
                 await _unitOfWork.Comments.SaveChangesAsync();
 
                 _logger.LogInformation("Comment created successfully for post ID: {PostId}", dto.PostId);
+
+                // Send notification to the post owner if they are not the commenter
+                if (post.UserId != userId)
+                {
+                    await _notificationService.SendNotificationAsync(userId, new NotificationCreationDto
+                    {
+                        UserId = post.UserId,
+                        Type = "Comment",
+                        ReferenceId = dto.PostId, // Reference to the post
+                        Message = "commented on your post."
+                    });
+                }
             }
             catch (Exception ex)
             {

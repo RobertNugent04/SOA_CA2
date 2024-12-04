@@ -29,6 +29,12 @@ namespace SOA_CA2.Models
         public User User { get; set; }
 
         /// <summary>
+        /// Foreign key referencing the User who sent the notification.
+        /// </summary>
+        [Required]
+        public int SenderId { get; set; }
+
+        /// <summary>
         /// The type of the notification (like FriendRequest, Message, Like, Comment, Call).
         /// </summary>
         [Required]

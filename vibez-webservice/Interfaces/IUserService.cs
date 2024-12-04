@@ -56,5 +56,10 @@ namespace SOA_CA2.Interfaces
         /// Deletes the currently authenticated user's account.
         /// </summary>
         Task DeleteAccountAsync(int userId);
+
+        /// <summary>
+        /// Retrieves the user's profile information.
+        /// </summary>
+        Task<UserProfileDto?> GetUserProfileAsync(int userId);
     }
 }

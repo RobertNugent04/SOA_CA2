@@ -46,6 +46,11 @@ namespace SOA_CA2.Interfaces
         Task<bool> PostExistsAsync(int postId);
 
         /// <summary>
+        /// Retrieves all posts created by a user.
+        /// </summary>
+        Task<IEnumerable<Post>> GetAllPostsByUserIdAsync(int userId);
+
+        /// <summary>
         /// Saves changes to the data store.
         /// <summary>
         Task SaveChangesAsync();

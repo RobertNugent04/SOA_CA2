@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
+using SOA_CA2.Models.DTOs.Notification;
 using SOA_CA2.Models.DTOs.Post;
 using SOA_CA2.Services;
 using System;
@@ -18,6 +19,7 @@ namespace SOA_CA2.Tests
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<PostService>> _loggerMock;
+        private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly PostService _postService;
 
         public PostServiceTests()
@@ -25,7 +27,12 @@ namespace SOA_CA2.Tests
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<PostService>>();
-            _postService = new PostService(_unitOfWorkMock.Object, _mapperMock.Object, _loggerMock.Object);
+            _notificationServiceMock = new Mock<INotificationService>();
+            _postService = new PostService(
+                _unitOfWorkMock.Object,
+                _mapperMock.Object,
+                _loggerMock.Object,
+                _notificationServiceMock.Object);
         }
 
         [Fact]
@@ -127,21 +134,52 @@ namespace SOA_CA2.Tests
         }
 
         [Fact]
-        public async Task CreatePostAsync_ShouldAddPost_WhenValidDataProvided()
+        public async Task CreatePostAsync_ShouldAddPostAndTriggerNotifications_WhenValidDataProvided()
         {
             // Arrange
             int userId = 1;
+            int postId = 1;
             PostCreationDto dto = new PostCreationDto
             {
                 Content = "New Post Content",
                 ImageUrl = null
             };
             string? imagePath = "/posts-images/new-post.jpg";
+            Post post = new Post { PostId = postId, UserId = userId, Content = "New Post Content" };
+
+            List<User> friends = new List<User>
+            {
+                new User
+                {
+                    UserId = 2,
+                    FullName = "John Doe",
+                    UserName = "johndoe",
+                    Email = "johndoe@example.com",
+                    PasswordHash = "hashedpassword123",
+                    CreatedAt = DateTime.UtcNow,
+                },
+                new User
+                {
+                    UserId = 3,
+                    FullName = "Jane Smith",
+                    UserName = "janesmith",
+                    Email = "janesmith@example.com",
+                    PasswordHash = "hashedpassword456",
+                    CreatedAt = DateTime.UtcNow,
+                }
+            };
 
             _unitOfWorkMock.Setup(u => u.Posts.AddPostAsync(It.IsAny<Post>()))
+                .Callback<Post>(p => p.PostId = postId)
                 .Returns(Task.CompletedTask);
 
             _unitOfWorkMock.Setup(u => u.Posts.SaveChangesAsync())
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock.Setup(u => u.Friendships.GetAcceptedFriendsAsync(userId))
+                .ReturnsAsync(friends);
+
+            _notificationServiceMock.Setup(n => n.SendNotificationAsync(userId, It.IsAny<NotificationCreationDto>()))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -150,6 +188,18 @@ namespace SOA_CA2.Tests
             // Assert
             _unitOfWorkMock.Verify(u => u.Posts.AddPostAsync(It.IsAny<Post>()), Times.Once);
             _unitOfWorkMock.Verify(u => u.Posts.SaveChangesAsync(), Times.Once);
+
+            _notificationServiceMock.Verify(n => n.SendNotificationAsync(userId, It.Is<NotificationCreationDto>(n =>
+                n.UserId == 2 &&
+                n.Type == "Post" &&
+                n.ReferenceId == postId &&
+                n.Message == "posted something.")), Times.Once);
+
+            _notificationServiceMock.Verify(n => n.SendNotificationAsync(userId, It.Is<NotificationCreationDto>(n =>
+                n.UserId == 3 &&
+                n.Type == "Post" &&
+                n.ReferenceId == postId &&
+                n.Message == "posted something.")), Times.Once);
         }
 
         [Fact]
