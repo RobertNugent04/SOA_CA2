@@ -12,9 +12,12 @@ export const UserRoute: React.FC = () => {
       <div className="content-wrapper">
         <div className="posts-container">
           <UserCard userId = "1"/>
+          <div className="posts">
+          <Posts isUserPage={true} userId="1" />
+          </div>
         </div>
         <div className="messages-container">
-          <MessageTab currentUserId={1} />
+          <MessageTab currentUserId={2} />
         </div>
       </div>
     </div>
