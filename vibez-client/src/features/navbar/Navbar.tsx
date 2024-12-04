@@ -4,13 +4,14 @@ import './navbar.css';
 import logo from '../../assets/images/vibez_logo.jpg';
 import bell from '../../assets/images/notification_bell.png';
 import search from '../../assets/images/search_icon.png';
-import profilePic from '../../assets/images/default_pfp.png'; // Import profile picture
+import profilePic from '../../assets/images/default_pfp.png'; 
 
 export const Navbar = () => {
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <Link to="/">
+        <Link to="/home">
           <img src={logo} alt="Vibez Logo" className="navbar-logo" />
         </Link>
       </div>
@@ -23,7 +24,9 @@ export const Navbar = () => {
           <input type="text" placeholder="Search" className="navbar-search-input" />
         </div>
         <div className="navbar-profile">
-          <img src={profilePic} alt="Profile" className="navbar-profile-pic" />
+        <Link to="/user">
+            <img src={profilePic} alt="Profile" className="navbar-profile-pic" />
+          </Link>
         </div>
       </div>
     </nav>
