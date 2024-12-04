@@ -8,6 +8,8 @@
         IUserRepository Users { get; }
 
         IPostRepository Posts { get; }
+
+        ICommentRepository Comments { get; }
         Task SaveChangesAsync();
     }
 }

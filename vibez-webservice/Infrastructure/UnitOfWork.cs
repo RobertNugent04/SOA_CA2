@@ -22,6 +22,7 @@ namespace SOA_CA2
             _context = context;
             Users = new UserRepository(context, loggerFactory.CreateLogger<UserRepository>());
             Posts = new PostRepository(context, loggerFactory.CreateLogger<PostRepository>());
+            Comments = new CommentRepository(context, loggerFactory.CreateLogger<CommentRepository>());
         }
 
         /// <inheritdoc />
@@ -29,6 +30,8 @@ namespace SOA_CA2
 
         /// <inheritdoc />
         public IPostRepository Posts { get; }
+
+        public ICommentRepository Comments { get; }
 
         /// <inheritdoc />
         public async Task SaveChangesAsync()
