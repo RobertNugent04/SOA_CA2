@@ -24,6 +24,7 @@ namespace SOA_CA2
             Posts = new PostRepository(context, loggerFactory.CreateLogger<PostRepository>());
             Comments = new CommentRepository(context, loggerFactory.CreateLogger<CommentRepository>());
             Likes = new LikeRepository(context, loggerFactory.CreateLogger<LikeRepository>());
+            Friendships = new FriendshipRepository(context, loggerFactory.CreateLogger<FriendshipRepository>());
         }
 
         /// <inheritdoc />
@@ -37,6 +38,9 @@ namespace SOA_CA2
 
         /// <inheritdoc />
         public ILikeRepository Likes { get; }
+
+        /// <inheritdoc />
+        public IFriendshipRepository Friendships { get; }
 
         /// <inheritdoc />
         public async Task SaveChangesAsync()

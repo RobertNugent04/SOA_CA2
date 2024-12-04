@@ -12,6 +12,8 @@
         ICommentRepository Comments { get; }
 
         ILikeRepository Likes { get; }
+
+        IFriendshipRepository Friendships { get; }
         Task SaveChangesAsync();
     }
 }
