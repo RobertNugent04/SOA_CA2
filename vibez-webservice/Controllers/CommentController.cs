@@ -3,6 +3,7 @@ using SOA_CA2.Interfaces;
 using SOA_CA2.Models.DTOs.Comment;
 using SOA_CA2.Middleware;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SOA_CA2.Controllers
 {
@@ -32,6 +33,7 @@ namespace SOA_CA2.Controllers
         /// </summary>
         /// <param name="postId">The ID of the post to retrieve comments for.</param>
         /// <returns>A list of comments associated with the post.</returns>
+        [AuthorizeUser]
         [HttpGet("post/{postId}")]
         public async Task<IActionResult> GetCommentsForPost(int postId)
         {

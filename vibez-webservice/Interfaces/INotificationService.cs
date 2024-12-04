@@ -22,6 +22,6 @@ namespace SOA_CA2.Interfaces
         /// <summary>
         /// Marks a notification as read.
         /// </summary>
-        Task MarkNotificationAsReadAsync(int notificationId);
+        Task MarkNotificationAsReadAsync(int userId, int notificationId);
     }
 }

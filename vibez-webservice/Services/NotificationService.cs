@@ -85,6 +85,7 @@ namespace SOA_CA2.Services
                 return notifications.Select(n => new NotificationDto
                 {
                     NotificationId = n.NotificationId,
+                    SenderId = n.SenderId,
                     Type = n.Type,
                     ReferenceId = n.ReferenceId,
                     Message = n.Message,
@@ -100,7 +101,7 @@ namespace SOA_CA2.Services
         }
 
         /// <inheritdoc />
-        public async Task MarkNotificationAsReadAsync(int notificationId)
+        public async Task MarkNotificationAsReadAsync(int userId, int notificationId)
         {
             try
             {
@@ -111,6 +112,12 @@ namespace SOA_CA2.Services
                 if (notification == null)
                 {
                     throw new ArgumentException("Notification not found.");
+                }
+
+                if (notification.UserId != userId)
+                {
+                    _logger.LogWarning("User ID: {UserId} is not authorized to mark notification ID: {NotificationId} as read.", userId, notificationId);
+                    throw new UnauthorizedAccessException("You are not authorized to mark this notification as read.");
                 }
 
                 notification.IsRead = true;
