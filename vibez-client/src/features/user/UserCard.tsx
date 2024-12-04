@@ -22,7 +22,7 @@ export const UserCard: React.FC<UserCardProps> = ({userId}) => {
   return (
     <div className="user-card">
       <img src={profilePic} alt="profile" className="profile-picture" />
-      <div className="user-info">
+      <div className="current-user-info">
         <h2 className="username">{user.username}</h2>
         <p className="join-date">Joined {user.joinDate}</p>
         <p className="bio">{user.bio}</p>
