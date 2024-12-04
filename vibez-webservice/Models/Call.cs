@@ -57,13 +57,13 @@ namespace SOA_CA2.Models
         /// <summary>
         /// The timestamp when the call started - UTC.
         /// </summary>
-        [Column(TypeName = "timestamp")]
+        [Column(TypeName = "timestamptz")]
         public DateTime? StartedAt { get; set; }
 
         /// <summary>
         /// The timestamp when the call ended - UTC.
         /// </summary>
-        [Column(TypeName = "timestamp")]
+        [Column(TypeName = "timestamptz")]
         public DateTime? EndedAt { get; set; }
 
         /// <summary>

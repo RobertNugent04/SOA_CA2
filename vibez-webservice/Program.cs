@@ -27,7 +27,9 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 // Add Scoped Dependencies
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IOtpCacheManager, OtpCacheManager>(); // Singleton for caching OTPs

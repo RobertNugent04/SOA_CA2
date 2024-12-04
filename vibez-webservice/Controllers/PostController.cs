@@ -26,10 +26,33 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
+        /// Retrieves all posts with pagination.
+        /// </summary>
+        /// <param name="pageNumber">The current page number (default: 1).</param>
+        /// <param name="pageSize">The number of posts per page (default: 20).</param>
+        /// <returns>A list of post DTOs.</returns>
+        [HttpGet("activity-feed")]
+        public async Task<IActionResult> GetActivityFeed(int pageNumber = 1, int pageSize = 20)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching activity feed for page {PageNumber}.", pageNumber);
+
+                IEnumerable<PostDTO> posts = await _postService.GetAllPostsAsync(pageNumber, pageSize);
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching activity feed.");
+                return StatusCode(500, new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Retrieves all posts for the authenticated user with pagination.
         /// </summary>
         [AuthorizeUser]
-        [HttpGet]
+        [HttpGet("user-posts")]
         public async Task<IActionResult> GetPosts(int pageNumber = 1, int pageSize = 10)
         {
             try

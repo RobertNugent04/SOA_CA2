@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Post;
@@ -12,6 +13,7 @@ namespace SOA_CA2.Services
     public class PostService : IPostService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         private readonly ILogger<PostService> _logger;
 
         /// <summary>
@@ -19,10 +21,31 @@ namespace SOA_CA2.Services
         /// </summary>
         /// <param name="unitOfWork">Unit of work for database operations.</param>
         /// <param name="logger">Logger for debugging and tracking operations.</param>
-        public PostService(IUnitOfWork unitOfWork, ILogger<PostService> logger)
+        public PostService(IUnitOfWork unitOfWork,IMapper mapper, ILogger<PostService> logger)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
             _logger = logger;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<PostDTO>> GetAllPostsAsync(int pageNumber, int pageSize)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all posts for activity feed.");
+
+                IEnumerable<Post> posts = await _unitOfWork.Posts.GetPaginatedPostsAsync(pageNumber, pageSize);
+                IEnumerable<PostDTO> postDtos = posts.Select(post => _mapper.Map<PostDTO>(post));
+
+                _logger.LogInformation("Successfully fetched {Count} posts for page {PageNumber}.", postDtos.Count(), pageNumber);
+                return postDtos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching posts for activity feed.");
+                throw;
+            }
         }
 
         /// <inheritdoc />

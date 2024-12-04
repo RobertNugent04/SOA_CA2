@@ -8,6 +8,14 @@ namespace SOA_CA2.Interfaces
     public interface IPostRepository
     {
         /// <summary>
+        /// Retrieves a paginated list of posts.
+        /// </summary>
+        /// <param name="pageNumber">The current page number.</param>
+        /// <param name="pageSize">The number of posts per page.</param>
+        /// <returns>A paginated list of posts.</returns>
+        Task<IEnumerable<Post>> GetPaginatedPostsAsync(int pageNumber, int pageSize);
+
+        /// <summary>
         /// Retrieves all posts created by a user.
         /// </summary>
         Task<IEnumerable<Post>> GetAllPostsAsync(int userId, int pageNumber, int pageSize);

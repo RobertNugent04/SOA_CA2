@@ -40,6 +40,12 @@ namespace SOA_CA2.Infrastructure
 
             CreateMap<PostUpdateDto, Post>();
 
+            CreateMap<Post, PostDTO>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+
             // **Comment Mappings**
             CreateMap<CommentCreationDto, Comment>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));

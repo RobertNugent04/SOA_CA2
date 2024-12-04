@@ -26,6 +26,30 @@ namespace SOA_CA2.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<Post>> GetPaginatedPostsAsync(int pageNumber, int pageSize)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching posts for page {PageNumber} with page size {PageSize}.", pageNumber, pageSize);
+
+                List<Post> posts = await _context.Posts
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(p => p.User)
+                    .ToListAsync();
+
+                _logger.LogInformation("Fetched {Count} posts for page {PageNumber}.", posts.Count, pageNumber);
+                return posts;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching paginated posts.");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<Post>> GetAllPostsAsync(int userId, int pageNumber, int pageSize)
         {
             try
