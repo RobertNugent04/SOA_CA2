@@ -21,10 +21,14 @@ namespace SOA_CA2
         {
             _context = context;
             Users = new UserRepository(context, loggerFactory.CreateLogger<UserRepository>());
+            Posts = new PostRepository(context, loggerFactory.CreateLogger<PostRepository>());
         }
 
         /// <inheritdoc />
         public IUserRepository Users { get; }
+
+        /// <inheritdoc />
+        public IPostRepository Posts { get; }
 
         /// <inheritdoc />
         public async Task SaveChangesAsync()
