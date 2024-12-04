@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using AutoMapper;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Comment;
+using SOA_CA2.Models.DTOs.Notification;
 using SOA_CA2.Services;
 using SOA_CA2.Interfaces;
 
@@ -16,6 +17,7 @@ namespace SOA_CA2.Tests
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<CommentService>> _loggerMock;
+        private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly CommentService _commentService;
 
         public CommentServiceTests()
@@ -23,7 +25,12 @@ namespace SOA_CA2.Tests
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<CommentService>>();
-            _commentService = new CommentService(_unitOfWorkMock.Object, _mapperMock.Object, _loggerMock.Object);
+            _notificationServiceMock = new Mock<INotificationService>();
+            _commentService = new CommentService(
+                _unitOfWorkMock.Object,
+                _mapperMock.Object,
+                _loggerMock.Object,
+                _notificationServiceMock.Object);
         }
 
         [Fact]
@@ -32,10 +39,10 @@ namespace SOA_CA2.Tests
             // Arrange
             int postId = 1;
             List<Comment> comments = new List<Comment>
-        {
-            new Comment { CommentId = 1, Content = "Great post!", UserId = 2, PostId = postId },
-            new Comment { CommentId = 2, Content = "Nice work!", UserId = 3, PostId = postId }
-        };
+            {
+                new Comment { CommentId = 1, Content = "Great post!", UserId = 2, PostId = postId },
+                new Comment { CommentId = 2, Content = "Nice work!", UserId = 3, PostId = postId }
+            };
 
             _unitOfWorkMock.Setup(u => u.Comments.GetCommentsByPostIdAsync(postId))
                 .ReturnsAsync(comments);
@@ -43,8 +50,8 @@ namespace SOA_CA2.Tests
             _mapperMock.Setup(m => m.Map<IEnumerable<CommentDto>>(comments))
                 .Returns(new List<CommentDto>
                 {
-                new CommentDto { CommentId = 1, Content = "Great post!", UserId = 2, PostId = postId },
-                new CommentDto { CommentId = 2, Content = "Nice work!", UserId = 3, PostId = postId }
+                    new CommentDto { CommentId = 1, Content = "Great post!", UserId = 2, PostId = postId },
+                    new CommentDto { CommentId = 2, Content = "Nice work!", UserId = 3, PostId = postId }
                 });
 
             // Act
@@ -56,11 +63,21 @@ namespace SOA_CA2.Tests
         }
 
         [Fact]
-        public async Task CreateCommentAsync_ShouldAddComment_WhenDataIsValid()
+        public async Task CreateCommentAsync_ShouldAddCommentAndSendNotification_WhenDataIsValid()
         {
             // Arrange
             int userId = 1;
-            CommentCreationDto dto = new CommentCreationDto { Content = "This is my comment!", PostId = 1 };
+            int postOwnerId = 2;
+            int postId = 1;
+            CommentCreationDto dto = new CommentCreationDto { Content = "This is my comment!", PostId = postId };
+
+            Post post = new Post
+            {
+                PostId = postId,
+                UserId = postOwnerId,
+                Content = "Original Content",
+                CreatedAt = DateTime.UtcNow
+            };
 
             Comment comment = new Comment
             {
@@ -71,10 +88,8 @@ namespace SOA_CA2.Tests
                 CreatedAt = DateTime.UtcNow
             };
 
-            _mapperMock.Setup(m => m.Map<Comment>(dto))
-                .Returns(comment);
-
-            _unitOfWorkMock.Setup(u => u.Comments.AddCommentAsync(comment)).Returns(Task.CompletedTask);
+            _unitOfWorkMock.Setup(u => u.Posts.GetPostByIdAsync(postId)).ReturnsAsync(post);
+            _unitOfWorkMock.Setup(u => u.Comments.AddCommentAsync(It.IsAny<Comment>())).Returns(Task.CompletedTask);
             _unitOfWorkMock.Setup(u => u.Comments.SaveChangesAsync()).Returns(Task.CompletedTask);
 
             // Act
@@ -83,6 +98,12 @@ namespace SOA_CA2.Tests
             // Assert
             _unitOfWorkMock.Verify(u => u.Comments.AddCommentAsync(It.IsAny<Comment>()), Times.Once);
             _unitOfWorkMock.Verify(u => u.Comments.SaveChangesAsync(), Times.Once);
+            _notificationServiceMock.Verify(n => n.SendNotificationAsync(userId, It.Is<NotificationCreationDto>(dto =>
+                dto.UserId == postOwnerId &&
+                dto.Type == "Comment" &&
+                dto.ReferenceId == postId &&
+                dto.Message == "commented on your post."
+            )), Times.Once);
         }
 
         [Fact]

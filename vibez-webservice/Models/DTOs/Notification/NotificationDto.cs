@@ -6,6 +6,8 @@
     public class NotificationDto
     {
         public int NotificationId { get; set; }
+        public int SenderId { get; set; }
+        public string SenderName { get; set; }
         public required string Type { get; set; }
         public int? ReferenceId { get; set; }
         public required string Message { get; set; }

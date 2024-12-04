@@ -352,5 +352,35 @@ namespace SOA_CA2.Controllers
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
+
+        /// <summary>
+        /// Retrieves the profile of a user by their unique identifier.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user.</param>
+        /// <returns>Returns the user's profile information.</returns>
+        [AuthorizeUser]
+        [HttpGet("{userId}/profile")]
+        public async Task<IActionResult> GetUserProfile(int userId)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching profile for user ID: {UserId}", userId);
+
+                UserProfileDto? profile = await _userService.GetUserProfileAsync(userId);
+                if (profile == null)
+                {
+                    _logger.LogWarning("Profile not found for user ID: {UserId}", userId);
+                    return NotFound(new { Error = "Profile not found." });
+                }
+
+                _logger.LogInformation("Profile retrieved successfully for user ID: {UserId}", userId);
+                return Ok(profile);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching profile for user ID: {UserId}", userId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
     }
 }

@@ -33,6 +33,11 @@ namespace SOA_CA2.Interfaces
         Task<Friendship?> GetFriendshipBetweenUsersAsync(int userId, int friendId);
 
         /// <summary>
+        /// Retrieves Users that have being accepted as friends for a given user.
+        /// </summary>
+        Task<IEnumerable<User>> GetAcceptedFriendsAsync(int userId);
+
+        /// <summary>
         /// Saves changes to the database.
         /// </summary>
         Task SaveChangesAsync();

@@ -114,6 +114,28 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
+        /// Retrieves the conversation for a specific message.
+        /// </summary>
+        /// <param name="messageId">The ID of the message to retrieve the conversation for.</param>
+        /// <returns>Returns a list of conversation messages.</returns>
+        [AuthorizeUser]
+        [HttpGet("{messageId}")]
+        public async Task<IActionResult> GetConversationByMessage(int messageId)
+        {
+            try
+            {
+                int userId = GetUserIdFromToken();
+                IEnumerable<MessageDto> conversation = await _messageService.GetConversationByMessageAsync(messageId, userId);
+                return Ok(conversation);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching conversation for message ID: {MessageId}", messageId);
+                return StatusCode(500, new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Retrieves the user ID from the JWT token.
         /// </summary>
         private int GetUserIdFromToken()

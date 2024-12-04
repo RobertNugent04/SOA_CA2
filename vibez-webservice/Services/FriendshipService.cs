@@ -2,6 +2,7 @@
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Friendship;
+using SOA_CA2.Models.DTOs.Notification;
 
 namespace SOA_CA2.Services
 {
@@ -12,14 +13,16 @@ namespace SOA_CA2.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<FriendshipService> _logger;
+        private readonly INotificationService _notificationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FriendshipService"/> class.
         /// </summary>
-        public FriendshipService(IUnitOfWork unitOfWork, ILogger<FriendshipService> logger)
+        public FriendshipService(IUnitOfWork unitOfWork, ILogger<FriendshipService> logger, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         /// <inheritdoc />
@@ -47,6 +50,15 @@ namespace SOA_CA2.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 _logger.LogInformation("Friend request sent successfully from user ID: {UserId} to friend ID: {FriendId}.", userId, dto.FriendId);
+
+                // Send notification to the recipient of the friend request
+                await _notificationService.SendNotificationAsync(userId, new NotificationCreationDto
+                {
+                    UserId = dto.FriendId,
+                    Type = "FriendRequest",
+                    ReferenceId = userId, // Reference to the sender's profile
+                    Message = "sent you a friend request."
+                });
             }
             catch (Exception ex)
             {
@@ -80,6 +92,19 @@ namespace SOA_CA2.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 _logger.LogInformation("Friendship status updated successfully for friend ID: {FriendId}.", friendId);
+
+                if (status == "Accepted")
+                {
+                    // Send notification to the user whose request was accepted
+                    int otherUserId = friendship.UserId == userId ? friendship.FriendId : friendship.UserId;
+                    await _notificationService.SendNotificationAsync(userId, new NotificationCreationDto
+                    {
+                        UserId = otherUserId,
+                        Type = "FriendRequestAccepted",
+                        ReferenceId = userId, // Reference to the person's profile
+                        Message = "accepted your friend request."
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -87,8 +112,6 @@ namespace SOA_CA2.Services
                 throw;
             }
         }
-
-
 
         /// <inheritdoc />
         public async Task<string?> GetFriendshipStatusAsync(int userId, int friendId)

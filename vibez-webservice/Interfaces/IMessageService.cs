@@ -25,6 +25,11 @@ namespace SOA_CA2.Interfaces
         Task<IEnumerable<MessageDto>> GetConversationMessagesAsync(int userId, int friendId);
 
         /// <summary>
+        /// Retrieves all messages in a conversation by a specific message.
+        /// </summary>
+        Task<IEnumerable<MessageDto>> GetConversationByMessageAsync(int messageId, int userId);
+
+        /// <summary>
         /// Deletes a message for the user.
         /// </summary>
         Task DeleteMessageAsync(int userId, int messageId);

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SOA_CA2.Events;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Post;
@@ -15,17 +16,19 @@ namespace SOA_CA2.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<PostService> _logger;
+        private readonly INotificationService _notificationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostService"/> class.
         /// </summary>
         /// <param name="unitOfWork">Unit of work for database operations.</param>
         /// <param name="logger">Logger for debugging and tracking operations.</param>
-        public PostService(IUnitOfWork unitOfWork,IMapper mapper, ILogger<PostService> logger)
+        public PostService(IUnitOfWork unitOfWork,IMapper mapper, ILogger<PostService> logger, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         /// <inheritdoc />
@@ -118,6 +121,10 @@ namespace SOA_CA2.Services
                 await _unitOfWork.Posts.SaveChangesAsync();
 
                 _logger.LogInformation("Post created successfully for user ID: {UserId}", userId);
+
+                // Trigger the post notification event
+                PostNotificationEvent postNotificationEvent = new PostNotificationEvent(userId, post.PostId, _unitOfWork, _notificationService, _logger);
+                await postNotificationEvent.HandleAsync();
             }
             catch (Exception ex)
             {

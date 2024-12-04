@@ -103,6 +103,24 @@ namespace SOA_CA2.Repositories
             }
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<User>> GetAcceptedFriendsAsync(int userId) {
+            try
+            {
+                _logger.LogInformation("Fetching accepted friends for user ID: {UserId}.", userId);
+
+                return await _context.Friendships
+                    .Where(f => (f.UserId == userId || f.FriendId == userId) && f.Status == "Accepted")
+                    .Select(f => f.UserId == userId ? f.Friend : f.User)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching accepted friends for user ID: {UserId}.", userId);
+                throw;
+            }
+        }
+
 
         /// <inheritdoc />
         public async Task SaveChangesAsync()

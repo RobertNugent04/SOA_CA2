@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Message;
+using SOA_CA2.Models.DTOs.Notification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,13 @@ namespace SOA_CA2.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<MessageService> _logger;
+        private readonly INotificationService _notificationService;
 
-        public MessageService(IUnitOfWork unitOfWork, ILogger<MessageService> logger)
+        public MessageService(IUnitOfWork unitOfWork, ILogger<MessageService> logger, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         /// <inheritdoc />
@@ -50,6 +53,15 @@ namespace SOA_CA2.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 _logger.LogInformation("Message sent successfully.");
+
+                // Notify the receiver
+                await _notificationService.SendNotificationAsync(senderId, new NotificationCreationDto
+                {
+                    UserId = dto.ReceiverId,
+                    Type = "Message",
+                    ReferenceId = message.MessageId,
+                    Message = "sent you a message."
+                });
             }
             catch (Exception ex)
             {
@@ -163,5 +175,44 @@ namespace SOA_CA2.Services
             }
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<MessageDto>> GetConversationByMessageAsync(int messageId, int userId)
+        {
+            try
+            {
+                // Fetch the message
+                Message? message = await _unitOfWork.Messages.GetMessageByIdAsync(messageId);
+
+                if (message == null)
+                {
+                    throw new ArgumentException("Message not found.");
+                }
+
+                // Ensure the user is either the sender or receiver of the message
+                if (message.SenderId != userId && message.ReceiverId != userId)
+                {
+                    throw new UnauthorizedAccessException("User is not authorized to view this conversation.");
+                }
+
+                // Fetch the full conversation
+                IEnumerable<Message> conversation = await _unitOfWork.Messages.GetConversationMessagesAsync(message.SenderId, message.ReceiverId);
+
+                return conversation.Select(m => new MessageDto
+                {
+                    MessageId = m.MessageId,
+                    SenderId = m.SenderId,
+                    ReceiverId = m.ReceiverId,
+                    Content = m.Content,
+                    IsDeletedBySender = m.IsDeletedBySender,
+                    IsDeletedByReceiver = m.IsDeletedByReceiver,
+                    CreatedAt = m.CreatedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching conversation for message ID: {MessageId}.", messageId);
+                throw;
+            }
+        }
     }
 }

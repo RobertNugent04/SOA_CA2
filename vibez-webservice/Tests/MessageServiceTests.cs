@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Message;
+using SOA_CA2.Models.DTOs.Notification;
 using SOA_CA2.Services;
 using System;
 using System.Collections.Generic;
@@ -16,17 +17,22 @@ namespace SOA_CA2.Tests
     {
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<ILogger<MessageService>> _loggerMock;
+        private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly MessageService _messageService;
 
         public MessageServiceTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _loggerMock = new Mock<ILogger<MessageService>>();
-            _messageService = new MessageService(_unitOfWorkMock.Object, _loggerMock.Object);
+            _notificationServiceMock = new Mock<INotificationService>();
+            _messageService = new MessageService(
+                _unitOfWorkMock.Object,
+                _loggerMock.Object,
+                _notificationServiceMock.Object);
         }
 
         [Fact]
-        public async Task SendMessageAsync_ShouldSendMessage_WhenUsersAreFriends()
+        public async Task SendMessageAsync_ShouldSendMessageAndTriggerNotification_WhenUsersAreFriends()
         {
             // Arrange
             int senderId = 1;
@@ -43,6 +49,12 @@ namespace SOA_CA2.Tests
             _unitOfWorkMock.Setup(u => u.Messages.AddMessageAsync(It.IsAny<Message>()))
                 .Verifiable();
 
+            _unitOfWorkMock.Setup(u => u.SaveChangesAsync())
+                .Returns(Task.CompletedTask);
+
+            _notificationServiceMock.Setup(n => n.SendNotificationAsync(senderId, It.IsAny<NotificationCreationDto>()))
+                .Returns(Task.CompletedTask);
+
             // Act
             await _messageService.SendMessageAsync(senderId, messageDto);
 
@@ -53,8 +65,12 @@ namespace SOA_CA2.Tests
                 m.Content == "Hello")), Times.Once);
 
             _unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
-        }
 
+            _notificationServiceMock.Verify(n => n.SendNotificationAsync(senderId, It.Is<NotificationCreationDto>(n =>
+                n.UserId == receiverId &&
+                n.Type == "Message" &&
+                n.Message == "sent you a message.")), Times.Once);
+        }
 
         [Fact]
         public async Task SendMessageAsync_ShouldThrowArgumentException_WhenUsersAreNotFriends()
@@ -74,6 +90,8 @@ namespace SOA_CA2.Tests
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
                 _messageService.SendMessageAsync(senderId, messageDto));
+
+            _notificationServiceMock.Verify(n => n.SendNotificationAsync(It.IsAny<int>(), It.IsAny<NotificationCreationDto>()), Times.Never);
         }
 
         [Fact]

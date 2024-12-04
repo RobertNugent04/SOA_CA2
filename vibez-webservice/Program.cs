@@ -7,6 +7,7 @@ using SOA_CA2.Repositories;
 using SOA_CA2.Services;
 using SOA_CA2.Utilities;
 using SOA_CA2.Models;
+using SOA_CA2.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add Scoped Dependencies
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -32,12 +36,14 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IOtpCacheManager, OtpCacheManager>(); // Singleton for caching OTPs
@@ -95,5 +101,8 @@ app.MapControllers();
 
 // Enable static files for the profile picture uploads
 app.UseStaticFiles();
+
+// Map SignalR hub
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

@@ -12,7 +12,7 @@ namespace SOA_CA2.Interfaces
         /// <summary>
         /// Creates and sends a new notification.
         /// </summary>
-        Task SendNotificationAsync(NotificationCreationDto dto);
+        Task SendNotificationAsync(int senderId, NotificationCreationDto dto);
 
         /// <summary>
         /// Retrieves all notifications for a user.
