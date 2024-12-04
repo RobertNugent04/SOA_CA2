@@ -74,7 +74,9 @@ namespace SOA_CA2.Repositories
             try
             {
                 _logger.LogInformation("Checking if friendship exists between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
-                return await _context.Friendships.AnyAsync(f => f.UserId == userId && f.FriendId == friendId);
+                // Check if a friendship exists between the two users.
+                return await _context.Friendships.AnyAsync(f => (f.UserId == userId && f.FriendId == friendId) ||
+                                                                (f.UserId == friendId && f.FriendId == userId));
             }
             catch (Exception ex)
             {
