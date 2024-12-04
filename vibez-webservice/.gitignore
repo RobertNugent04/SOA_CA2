@@ -16,3 +16,6 @@ appsettings.json
 
 #Image Files
 wwwroot/profile-pictures/
+
+#Posts Images
+wwwroot/posts-images/
