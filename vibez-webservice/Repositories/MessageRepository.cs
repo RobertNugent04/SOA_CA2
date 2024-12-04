@@ -95,6 +95,36 @@ namespace SOA_CA2.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<Message?> GetMessageByIdAsync(int messageId)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching message by ID: {MessageId}.", messageId);
+                return await _context.Messages.FindAsync(messageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching message by ID: {MessageId}.", messageId);
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public void RemoveMessage(Message message)
+        {
+            try
+            {
+                _logger.LogInformation("Removing message ID: {MessageId}.", message.MessageId);
+                _context.Messages.Remove(message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing message ID: {MessageId}.", message.MessageId);
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task SaveChangesAsync()
         {
             try

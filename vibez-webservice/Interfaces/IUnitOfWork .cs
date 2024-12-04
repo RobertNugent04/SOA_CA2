@@ -14,6 +14,9 @@
         ILikeRepository Likes { get; }
 
         IFriendshipRepository Friendships { get; }
+
+        IMessageRepository Messages { get; }
+
         Task SaveChangesAsync();
     }
 }
