@@ -13,32 +13,44 @@ namespace SOA_CA2.Utilities
     public class JwtGenerator : IJwtGenerator
     {
         private readonly string _secretKey;
+        private readonly ILogger<JwtGenerator> _logger;
 
-        public JwtGenerator(IConfiguration configuration)
+        public JwtGenerator(IConfiguration configuration, ILogger<JwtGenerator> logger)
         {
             _secretKey = configuration["Jwt:Key"];
+            _logger = logger;
         }
 
         public string GenerateToken(User user)
         {
-            Claim[] claims = new[]
+            try
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
-            };
+                Claim[] claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                };
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+                SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: "vibez",
-                audience: "vibez",
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds);
+                JwtSecurityToken token = new JwtSecurityToken(
+                    issuer: "vibez",
+                    audience: "vibez",
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddHours(2),
+                    signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                string generatedToken = new JwtSecurityTokenHandler().WriteToken(token);
+                _logger.LogInformation("JWT generated successfully for UserId {UserId}.", user.UserId);
+                return generatedToken;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating JWT for UserId {UserId}.", user.UserId);
+                throw;
+            }
         }
     }
 }

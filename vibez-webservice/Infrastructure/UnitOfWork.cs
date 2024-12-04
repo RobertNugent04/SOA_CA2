@@ -1,4 +1,5 @@
-﻿using SOA_CA2.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
+using SOA_CA2.Infrastructure;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Repositories;
 
@@ -15,10 +16,11 @@ namespace SOA_CA2
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
         /// </summary>
         /// <param name="context">Database context.</param>
-        public UnitOfWork(AppDbContext context)
+        /// <param name="loggerFactory">Factory for creating logger instances.</param>
+        public UnitOfWork(AppDbContext context, ILoggerFactory loggerFactory)
         {
             _context = context;
-            Users = new UserRepository(context);
+            Users = new UserRepository(context, loggerFactory.CreateLogger<UserRepository>());
         }
 
         /// <inheritdoc />
@@ -27,7 +29,14 @@ namespace SOA_CA2
         /// <inheritdoc />
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while saving changes to the database.", ex);
+            }
         }
 
         /// <inheritdoc />

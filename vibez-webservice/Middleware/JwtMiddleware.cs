@@ -12,14 +12,16 @@ namespace SOA_CA2.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JwtMiddleware> _logger;
 
         /// <summary>
-        /// Initializes the middleware with the request delegate and configuration.
+        /// Initializes the middleware with the request delegate, configuration, and logger.
         /// </summary>
-        public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
+        public JwtMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<JwtMiddleware> logger)
         {
             _next = next;
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -45,17 +47,23 @@ namespace SOA_CA2.Middleware
                     };
 
                     System.Security.Claims.ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(token, parameters, out _);
-                    // Log claims for debugging
-                    foreach (var claim in claimsPrincipal.Claims)
+
+                    _logger.LogInformation("Token validated successfully. Attaching claims to HttpContext.");
+                    foreach (System.Security.Claims.Claim claim in claimsPrincipal.Claims)
                     {
-                        Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
+                        _logger.LogDebug("Claim Type: {Type}, Value: {Value}", claim.Type, claim.Value);
                     }
+
                     context.Items["User"] = claimsPrincipal;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Token validation failed, do nothing
+                    _logger.LogWarning(ex, "Token validation failed.");
                 }
+            }
+            else
+            {
+                _logger.LogInformation("No Authorization token found in the request.");
             }
 
             await _next(context);
