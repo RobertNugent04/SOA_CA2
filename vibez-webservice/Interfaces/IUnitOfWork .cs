@@ -10,6 +10,8 @@
         IPostRepository Posts { get; }
 
         ICommentRepository Comments { get; }
+
+        ILikeRepository Likes { get; }
         Task SaveChangesAsync();
     }
 }
