@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace SOA_CA2.Models.DTOs.User
 {
@@ -20,9 +21,8 @@ namespace SOA_CA2.Models.DTOs.User
         public string? Bio { get; set; }
 
         /// <summary>
-        /// The URL to the new profile picture.
+        /// The profile picture file to be uploaded.
         /// </summary>
-        [StringLength(255)]
-        public string? ProfilePictureUrl { get; set; }
+        public IFormFile? ProfilePicture { get; set; }
     }
 }

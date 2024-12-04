@@ -19,5 +19,10 @@
         /// Invalidates an OTP for a user.
         /// </summary>
         void InvalidateOtp(int userId);
+
+        /// <summary>
+        /// Checks if a user has a valid OTP.
+        /// </summary>
+        bool HasValidOtp(int userId);
     }
 }

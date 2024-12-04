@@ -12,18 +12,21 @@ namespace SOA_CA2.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JwtMiddleware> _logger;
 
-        public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
+        /// <summary>
+        /// Initializes the middleware with the request delegate, configuration, and logger.
+        /// </summary>
+        public JwtMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<JwtMiddleware> logger)
         {
             _next = next;
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
-        /// Method to validate JWT tokens.
+        /// Validates the JWT token and attaches the claims to the HttpContext.
         /// </summary>
-        /// <param name="context">The HTTP context.</param>
-        /// <returns>Returns the task object representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
             string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -35,20 +38,32 @@ namespace SOA_CA2.Middleware
                     JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
                     byte[] key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
-                    tokenHandler.ValidateToken(token, new TokenValidationParameters
+                    TokenValidationParameters parameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
-                    }, out _);
+                        ValidateAudience = false,
+                    };
+
+                    System.Security.Claims.ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(token, parameters, out _);
+
+                    _logger.LogInformation("Token validated successfully. Attaching claims to HttpContext.");
+                    foreach (System.Security.Claims.Claim claim in claimsPrincipal.Claims)
+                    {
+                        _logger.LogDebug("Claim Type: {Type}, Value: {Value}", claim.Type, claim.Value);
+                    }
+
+                    context.Items["User"] = claimsPrincipal;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Invalid Token");
-                    return;
+                    _logger.LogWarning(ex, "Token validation failed.");
                 }
+            }
+            else
+            {
+                _logger.LogInformation("No Authorization token found in the request.");
             }
 
             await _next(context);

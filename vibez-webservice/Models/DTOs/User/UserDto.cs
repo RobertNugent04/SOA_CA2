@@ -31,9 +31,9 @@
         public string? Bio { get; set; }
 
         /// <summary>
-        /// The URL to the user's profile picture.
+        /// The Path to the user's profile picture.
         /// </summary>
-        public string? ProfilePictureUrl { get; set; }
+        public string? ProfilePicturePath { get; set; }
 
         /// <summary>
         /// The date and time when the user account was created.

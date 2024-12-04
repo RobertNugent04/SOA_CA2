@@ -25,7 +25,7 @@ namespace SOA_CA2.Interfaces
         /// <summary>
         /// Updates user profile information.
         /// </summary>
-        Task UpdateUserProfileAsync(int userId, UserUpdateDto dto);
+        Task UpdateUserProfileAsync(int userId, UserUpdateDto dto, string? profilePicturePath);
 
         /// <summary>
         /// Retrieves user details by their unique identifier.
@@ -41,5 +41,20 @@ namespace SOA_CA2.Interfaces
         /// Verifies an OTP and resets the user's password.
         /// </summary>
         Task VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword);
+
+        /// <summary>
+        /// Suggests a list of unique usernames based on a given name.
+        /// </summary>
+        Task<IEnumerable<string>> SuggestUsernamesAsync(string fullName);
+
+        /// <summary>
+        /// Searches for users by username or name.
+        /// </summary>
+        Task<IEnumerable<UserDTO>> SearchUsersAsync(string query);
+
+        /// <summary>
+        /// Deletes the currently authenticated user's account.
+        /// </summary>
+        Task DeleteAccountAsync(int userId);
     }
 }

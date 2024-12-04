@@ -33,15 +33,16 @@ namespace SOA_CA2.Middleware
             }
             catch (Exception ex)
             {
-                // Handle any uncaught exceptions.
                 _logger.LogError(ex, "An unexpected error occurred.");
                 await HandleExceptionAsync(context, ex);
             }
         }
 
+        /// <summary>
+        /// Handles exceptions and sends a standardized response.
+        /// </summary>
         private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            // Customize error response here.
             HttpResponse response = context.Response;
             response.ContentType = "application/json";
 
@@ -52,14 +53,15 @@ namespace SOA_CA2.Middleware
                 _ => (int)HttpStatusCode.InternalServerError
             };
 
-            string result = JsonSerializer.Serialize(new
+            var errorDetails = new
             {
                 error = exception.Message,
                 statusCode = statusCode
-            });
+            };
 
             response.StatusCode = statusCode;
-            return response.WriteAsync(result);
+
+            return response.WriteAsync(JsonSerializer.Serialize(errorDetails));
         }
     }
 }

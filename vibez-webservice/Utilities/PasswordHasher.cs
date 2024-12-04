@@ -1,58 +1,95 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.Logging;
 
 namespace SOA_CA2.Utilities
 {
     /// <summary>
     /// Provides methods to securely hash and verify passwords.
     /// </summary>
-    public static class PasswordHasher
+    public class PasswordHasher
     {
         private const int Iterations = 10000;
+        private readonly ILogger<PasswordHasher> _logger;
+
+        public PasswordHasher(ILogger<PasswordHasher> logger)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Hashes a plaintext password.
         /// </summary>
-        public static string HashPassword(string password)
+        public string HashPassword(string password)
         {
-            byte[] salt = GenerateSalt();
-            byte[] hash = KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: Iterations,
-                numBytesRequested: 256 / 8);
+            try
+            {
+                byte[] salt = GenerateSalt();
+                byte[] hash = KeyDerivation.Pbkdf2(
+                    password: password,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: Iterations,
+                    numBytesRequested: 256 / 8);
 
-            return $"{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
+                _logger.LogInformation("Password hashed successfully.");
+                return $"{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error hashing password.");
+                throw;
+            }
         }
 
         /// <summary>
         /// Verifies a password against its hash.
         /// </summary>
-        public static bool VerifyPassword(string password, string hashedPassword)
+        public bool VerifyPassword(string password, string hashedPassword)
         {
-            string[] parts = hashedPassword.Split('.');
-            if (parts.Length != 2) return false;
+            try
+            {
+                string[] parts = hashedPassword.Split('.');
+                if (parts.Length != 2)
+                {
+                    _logger.LogWarning("Invalid hashed password format.");
+                    return false;
+                }
 
-            byte[] salt = Convert.FromBase64String(parts[0]);
-            byte[] hash = Convert.FromBase64String(parts[1]);
+                byte[] salt = Convert.FromBase64String(parts[0]);
+                byte[] hash = Convert.FromBase64String(parts[1]);
 
-            byte[] hashToCompare = KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: Iterations,
-                numBytesRequested: 256 / 8);
+                byte[] hashToCompare = KeyDerivation.Pbkdf2(
+                    password: password,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: Iterations,
+                    numBytesRequested: 256 / 8);
 
-            return hash.SequenceEqual(hashToCompare);
+                bool isMatch = hash.SequenceEqual(hashToCompare);
+                _logger.LogInformation("Password verification result: {Result}", isMatch);
+                return isMatch;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verifying password.");
+                throw;
+            }
         }
 
         private static byte[] GenerateSalt()
         {
-            byte[] salt = new byte[16];
-            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
-            rng.GetBytes(salt);
-            return salt;
+            try
+            {
+                byte[] salt = new byte[16];
+                using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+                rng.GetBytes(salt);
+                return salt;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Error generating salt.", ex);
+            }
         }
     }
 }

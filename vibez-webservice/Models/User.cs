@@ -55,11 +55,11 @@ namespace SOA_CA2.Models
 		public string? Bio { get; set; }
 
         /// <summary>
-        /// The URL to the user's profile picture.
+        /// The path to the user's profile picture.
         /// </summary>
         [Column(TypeName = "varchar(255)")]
         [StringLength(255)]
-        public string? ProfilePictureUrl { get; set; }
+        public string? ProfilePicturePath { get; set; }
 
         /// <summary>
         /// Indicates whether the user's account is active.

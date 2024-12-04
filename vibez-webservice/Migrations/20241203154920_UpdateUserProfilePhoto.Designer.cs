@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SOA_CA2.Infrastructure;
@@ -11,9 +12,11 @@ using SOA_CA2.Infrastructure;
 namespace SOA_CA2.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20241203154920_UpdateUserProfilePhoto")]
+    partial class UpdateUserProfilePhoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,13 +50,13 @@ namespace SOA_CA2.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("EndedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("StartedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.HasKey("CallId");
 
@@ -78,7 +81,7 @@ namespace SOA_CA2.Migrations
                         .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<int>("PostId")
                         .HasColumnType("integer");
@@ -104,7 +107,7 @@ namespace SOA_CA2.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FriendshipId"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<int>("FriendId")
                         .HasColumnType("integer");
@@ -135,7 +138,7 @@ namespace SOA_CA2.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LikeId"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<int>("PostId")
                         .HasColumnType("integer");
@@ -165,7 +168,7 @@ namespace SOA_CA2.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<bool>("IsDeletedByReceiver")
                         .HasColumnType("boolean");
@@ -197,7 +200,7 @@ namespace SOA_CA2.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationId"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
@@ -238,14 +241,14 @@ namespace SOA_CA2.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
