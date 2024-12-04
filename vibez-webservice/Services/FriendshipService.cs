@@ -56,36 +56,64 @@ namespace SOA_CA2.Services
         }
 
         /// <inheritdoc />
-        public async Task UpdateFriendshipStatusAsync(int userId, int friendshipId, FriendshipUpdateDto dto)
+        public async Task UpdateFriendshipStatusAsync(int userId, int friendId, string status)
         {
             try
             {
-                _logger.LogInformation("Updating status of friendship ID: {FriendshipId} by user ID: {UserId}.", friendshipId, userId);
+                _logger.LogInformation("Updating friendship status for friend ID: {FriendId} by user ID: {UserId}.", friendId, userId);
 
-                Friendship? friendship = await _unitOfWork.Friendships.GetFriendshipByIdAsync(friendshipId);
+                Friendship? friendship = await _unitOfWork.Friendships.GetFriendshipBetweenUsersAsync(userId, friendId);
 
                 if (friendship == null)
                 {
                     throw new ArgumentException("Friendship not found.");
                 }
 
-                if (friendship.FriendId != userId)
+                if (friendship.FriendId != userId && friendship.UserId != userId)
                 {
                     throw new UnauthorizedAccessException("User is not authorized to update this friendship.");
                 }
 
-                friendship.Status = dto.Status;
+                friendship.Status = status;
 
                 await _unitOfWork.Friendships.UpdateFriendshipAsync(friendship);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Friendship status updated successfully for friendship ID: {FriendshipId}.", friendshipId);
+                _logger.LogInformation("Friendship status updated successfully for friend ID: {FriendId}.", friendId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating friendship status for friendship ID: {FriendshipId}.", friendshipId);
+                _logger.LogError(ex, "Error updating friendship status for friend ID: {FriendId}.", friendId);
                 throw;
             }
         }
+
+
+
+        /// <inheritdoc />
+        public async Task<string?> GetFriendshipStatusAsync(int userId, int friendId)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching friendship status between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
+
+                // Check if the friendship exists
+                Friendship? friendship = await _unitOfWork.Friendships.GetFriendshipBetweenUsersAsync(userId, friendId);
+                if (friendship == null)
+                {
+                    _logger.LogWarning("No friendship found between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
+                    return null;
+                }
+
+                _logger.LogInformation("Friendship status fetched successfully: {Status}.", friendship.Status);
+                return friendship.Status;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching friendship status between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
+                throw;
+            }
+        }
+
     }
 }

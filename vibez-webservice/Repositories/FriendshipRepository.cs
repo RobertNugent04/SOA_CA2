@@ -84,6 +84,25 @@ namespace SOA_CA2.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<Friendship?> GetFriendshipBetweenUsersAsync(int userId, int friendId)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching friendship between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
+
+                return await _context.Friendships
+                    .FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendId == friendId) ||
+                                              (f.UserId == friendId && f.FriendId == userId));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching friendship between user ID: {UserId} and friend ID: {FriendId}.", userId, friendId);
+                throw;
+            }
+        }
+
+
+        /// <inheritdoc />
         public async Task SaveChangesAsync()
         {
             try

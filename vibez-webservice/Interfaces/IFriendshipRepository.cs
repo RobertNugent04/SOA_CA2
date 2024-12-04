@@ -28,6 +28,11 @@ namespace SOA_CA2.Interfaces
         Task<bool> FriendshipExistsAsync(int userId, int friendId);
 
         /// <summary>
+        /// Retrieves the friendship status between two users.
+        /// </summary>
+        Task<Friendship?> GetFriendshipBetweenUsersAsync(int userId, int friendId);
+
+        /// <summary>
         /// Saves changes to the database.
         /// </summary>
         Task SaveChangesAsync();

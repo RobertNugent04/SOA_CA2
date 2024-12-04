@@ -15,6 +15,11 @@ namespace SOA_CA2.Interfaces
         /// <summary>
         /// Updates the status of a friendship (e.g., Accept/Reject).
         /// </summary>
-        Task UpdateFriendshipStatusAsync(int userId, int friendshipId, FriendshipUpdateDto dto);
+        Task UpdateFriendshipStatusAsync(int userId, int friendId, string status);
+
+        /// <summary>
+        /// Retrieves the status of a friendship.
+        /// </summary>
+        Task<string?> GetFriendshipStatusAsync(int userId, int friendId);
     }
 }
