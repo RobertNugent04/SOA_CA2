@@ -11,13 +11,19 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     width: 100%;
-    max-width: 700px;  /* Ensures the post doesn't expand beyond this width */
-    height: auto; /* Fixed height for each post */
+    max-width: 700px; 
+    height: auto; 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden;  /* Ensures no overflow */
+    overflow: hidden;  
+    transition: background-color 0.3s ease;
   }
+
+  .post-item:hover {
+    background-color: #f0f0f0; 
+    cursor: pointer; 
+}
   
   .post-header {
     display: flex;
@@ -118,6 +124,7 @@
     align-items: center;
     cursor: pointer;
     color: #666;
+    margin-left: 1rem;
   }
   
   .like-button img {

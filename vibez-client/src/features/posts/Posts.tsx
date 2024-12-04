@@ -3,12 +3,14 @@ import './posts.css';
 import black_like from '../../assets/images/black_like.png';
 import blue_like from '../../assets/images/blue_like.png';
 import send from '../../assets/images/send.png';
+import { PostDetails } from '../postDetails/PostDetails.tsx';
 
 export const Posts = () => {
 
     const [comments, setComments] = useState({});
     const [likes, setLikes] = useState({});
     const [likeImages, setLikeImages] = useState({});
+    const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
 
   const posts = [
@@ -61,11 +63,15 @@ export const Posts = () => {
       }));
   };
   
+  if (selectedPostId !== null) {
+    return <PostDetails postId={selectedPostId} posts={posts} />; // Render PostDetails if a post is clicked
+  }
+
     return (
       <div className="posts-container">
         <h2 className="posts-header">Posts</h2>
         {posts.map((post) => (
-          <div key={post.id} className="post-item">
+          <div key={post.id} className="post-item" onClick={() => setSelectedPostId(post.id)}>
             <div className="post-header">
               <div className="post-author-info">
                 <img
