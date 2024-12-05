@@ -10,7 +10,13 @@ export const AUTH_API = {
   REGISTER: `${API_BASE_URL}/api/users/register`,
   REQUEST_PASSWORD_RESET: `${API_BASE_URL}/api/users/request-password-reset`,
   SEARCH: `${API_BASE_URL}/api/users/search`,
-  GET_USER: `${API_BASE_URL}/api/users/profile`,
+};
+
+export const USER_API = {
+  
+    GET_USER: `${API_BASE_URL}/api/users/profile`,
+    UPDATE_USER: `${API_BASE_URL}/api/users/profile`,
+
 };
 
 

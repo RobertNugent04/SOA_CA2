@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
-import { getUserProfileRequest } from "../../api/userProfileRequest.ts";
+import { getProfileRequest } from "../../api/getProfile.ts";
 import { EditUser } from "./EditUser.tsx";
+import API_BASE_URL from "../../api/apiConsts.ts";
 
 type UserCardProps = {
   token: string;
@@ -35,7 +36,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
 
       try {
         console.log("UserCard token: ", token);
-        const response = await getUserProfileRequest(token, userId);
+        const response = await getProfileRequest(token, userId);
         console.log("UserCard response: ", response);
 
         if (response.success && response.data) {
@@ -50,6 +51,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
             createdAt: new Date(userProfile.createdAt).toLocaleDateString(),
             isActive: userProfile.isActive,
           });
+          
         } else {
           setError(response.error || "Failed to fetch user data.");
         }
@@ -75,7 +77,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
     return <p>User not found.</p>;
   }
 
-  const handleSave = (updatedData: { fullName: string; bio: string; profilePicture: File | null }) => {
+  const handleSave = (updatedData: { fullName: string; bio: string; profilePicture?: File | null }) => {
     console.log("Saved Data:", updatedData);
     setUser((prevUser) => ({
       ...prevUser!,
@@ -85,9 +87,12 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
     setIsEditing(false);
   };
 
+  const profilePictureUrl = user.profilePicturePath ? `${API_BASE_URL}${user.profilePicturePath}` : profilePic;
+  console.log("Profile Picture URL:", profilePictureUrl);
+
   return (
     <div className="user-card">
-      <img src={user.profilePicturePath || profilePic} alt="profile" className="profile-picture" />
+      <img src={profilePictureUrl} alt="profile" className="profile-picture" />
       <div className="current-user-info">
         <h2 className="username">{user.userName}</h2>
         <p className="join-date">Joined {user.createdAt}</p>
@@ -99,11 +104,11 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
 
       {isEditing && (
   <EditUser
-  fullName={user.fullName}
-  bio={user.bio}
-  onSave={handleSave}
-  onClose={() => setIsEditing(false)} // Close modal when Cancel or outside overlay is clicked
-/>
+          fullName={user.fullName}
+          bio={user.bio}
+          onSave={handleSave}
+          onClose={() => setIsEditing(false)} // Close modal when Cancel or outside overlay is clicked
+          token={token}/>
       )}
     </div>
   );
