@@ -5,6 +5,8 @@ type Post = {
   userId: number;
   content: string;
   imageUrl: string | null;
+  userName: string;
+  profilePicturePath: string | null;
   createdAt: string;
 };
 

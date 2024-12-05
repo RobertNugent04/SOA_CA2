@@ -3,9 +3,10 @@ import "./posts.css";
 import black_like from "../../assets/images/black_like.png";
 import blue_like from "../../assets/images/blue_like.png";
 import send from "../../assets/images/send.png";
+import API_BASE_URL from "../../api/apiConsts.ts";
 import { PostDetails } from "../postDetails/PostDetails.tsx";
 import { getProfileRequest } from "../../api/getProfile.ts";
-import API_BASE_URL from "../../api/apiConsts.ts";
+import { getFeedRequest } from "../../api/getFeedRequest.ts";
 import profilePic from "../../assets/images/default_pfp.png";
 
 type UserProfile = {
@@ -24,6 +25,8 @@ type Post = {
   userId: number;
   content: string;
   imageUrl: string | null;
+  userName: string;
+  profilePicturePath: string | null;
   createdAt: string;
 };
 
@@ -49,9 +52,9 @@ type PostsProps = {
 export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [comments, setComments] = useState({});
-  const [likes, setLikes] = useState({});
-  const [likeImages, setLikeImages] = useState({});
+  const [comments, setComments] = useState<{ [key: number]: string }>({});
+  const [likes, setLikes] = useState<{ [key: number]: number }>({});
+  const [likeImages, setLikeImages] = useState<{ [key: number]: string }>({});
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,13 +63,26 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const response = await getProfileRequest(token, userId);
-        if (response.success) {
-          const profileData = response.data!;
-          setPosts(isUserPage ? profileData.posts : []); // Only set user posts for user pages
-          setUserProfile(response.data!);
+        let response;
+
+        if (isUserPage) {
+          // Fetch the user's profile and posts
+          response = await getProfileRequest(token, userId);
+          if (response.success) {
+            const profileData = response.data!;
+            setPosts(profileData.posts); // Set user posts for user page
+            setUserProfile(profileData);
+          } else {
+            setError(response.error || "Failed to fetch user posts.");
+          }
         } else {
-          setError(response.error || "Failed to fetch posts.");
+          // Fetch the activity feed for a public feed
+          response = await getFeedRequest(token);
+          if (response.success) {
+            setPosts(response.data || []); 
+          } else {
+            setError(response.error || "Failed to fetch activity feed.");
+          }
         }
       } catch (err) {
         setError("An error occurred while fetching posts.");
@@ -75,9 +91,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
       }
     };
 
-    if (isUserPage) {
-      fetchPosts();
-    }
+    fetchPosts();
   }, [isUserPage, token, userId]);
 
   if (loading) return <p>Loading posts...</p>;
@@ -96,12 +110,12 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   const getPostImageUrl = (imageUrl: string | null) =>
     imageUrl ? `${API_BASE_URL}${imageUrl}` : undefined;
 
-  console.log("Post url: ", getPostImageUrl(posts[0].imageUrl));
 
   return (
     <div className="posts-container">
       <h2 className="posts-header">{isUserPage ? "User Posts" : "Posts"}</h2>
       {posts.map((post) => (
+        
         <div
           key={post.postId}
           className="post-item"
@@ -110,12 +124,12 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
           <div className="post-header">
             <div className="post-author-info">
               <img
-                src={profilePictureUrl || ""}
+                src={getPostImageUrl(post.profilePicturePath) || ""}
                 alt={`Post by user ${post.userId}`}
                 className="post-profile-pic"
               />
               <div className="post-author-date">
-                <span className="post-author">{user.userName}</span>
+                <span className="post-author">{post.userName}</span>
                 <span className="post-date">
                   · {new Date(post.createdAt).toLocaleDateString()}
                 </span>
@@ -123,9 +137,13 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
             </div>
           </div>
           <div className="post-content">{post.content}</div>
-
-            <img src={getPostImageUrl(post.imageUrl)} alt="Post" className="post-image" />
-
+          {post.imageUrl && (
+            <img
+              src={getPostImageUrl(post.imageUrl)}
+              alt="Post image"
+              className="post-image"
+            />
+          )}
           <div className="post-actions">
             <div className="comment-input-container">
               <input
@@ -143,9 +161,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
                 src={send}
                 alt="Send"
                 className="send-button"
-                onClick={() =>
-                  console.log(`Comment sent for post ${post.postId}`)
-                }
+                onClick={() => console.log(`Comment sent for post ${post.postId}`)}
               />
             </div>
             <div
