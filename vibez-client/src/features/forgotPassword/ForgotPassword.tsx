@@ -30,7 +30,7 @@ export const ForgotPassword = () => {
         // On successful registration, redirect to email verification page
         //store email in state
         //navigate("/email-verification", { state: { email } });
-        navigate("/");
+        navigate("/change-password", {state: {email}}); 
       }
     } catch (error) {
       setLoading(false);
@@ -63,7 +63,7 @@ export const ForgotPassword = () => {
           {/* Show loading spinner when submitting */}
           {loading ? (
             <button type="button" className="login-button" disabled>
-              Registering...
+              Requesting...
             </button>
           ) : (
             <button type="submit" className="login-button">
@@ -71,9 +71,6 @@ export const ForgotPassword = () => {
             </button>
           )}
         </form>
-        <p className="signup-text">
-          Already have an account? <Link to="/reset-request" className="signup-link">Log In</Link>
-        </p>
       </div>
     </div>
   );
