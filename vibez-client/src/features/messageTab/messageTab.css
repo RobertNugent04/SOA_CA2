@@ -1,0 +1,80 @@
+.messages-container {
+    position: fixed;
+    right: 0; 
+    top: 83px; 
+    height: calc(100vh - 60px); 
+    width: 400px; 
+    background-color: #f9f9f9; 
+    border-left: 2px solid #ccc; 
+    overflow-y: auto;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
+    z-index: 1000; 
+    padding: 1rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .messages-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #333;
+    border-bottom: 1px solid #ccc; 
+    padding-bottom: 0.5rem;
+    margin-bottom: 30px;
+  }
+  
+  .message-item {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .message-item:hover {
+    cursor: pointer;
+  }
+  
+  .message-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+  }
+  
+  .message-profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .message-content-wrapper {
+    flex-grow: 1;
+  }
+  
+  .message-sender {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .message-content {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .message-timestamp {
+    color: #666;
+    font-size: 0.875rem;
+    text-align: right;
+  }
+  
+  .message-item:hover {
+    background-color: #f0f0f0;
+  }
+  

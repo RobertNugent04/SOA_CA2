@@ -1,0 +1,71 @@
+.user-card {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease;
+    margin-top: 50px;
+    margin-right: 220px;
+    width: 100%;
+    max-width: 700px;
+  }
+  
+  .user-card:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .profile-picture {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #d3d3d3;
+    margin-left: 20px;
+  }
+  
+  .current-user-info {
+    display:flex;
+    flex-direction: column;
+    margin-left: 20px;
+    margin-top: 60px;
+  }
+  
+  .username {
+    font-size: 1.5em;
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .join-date {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: -5px;
+  }
+  
+  .bio {
+    font-size: 1em;
+    margin: 10px 0;
+  }
+  
+  .edit-profile-button {
+    margin-left: auto;
+    padding: 10px 15px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .edit-profile-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .posts{
+    margin-top: -60px;
+  }

@@ -11,3 +11,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.posts-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  margin-right: 215px; 
+  margin-top: 10px;
+}
+
+.messages-container {
+  width: 300px; 
+  background-color: #f4f4f4;
+  padding: 1rem;
+  box-shadow: -2px 0px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
