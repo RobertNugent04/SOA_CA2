@@ -1,4 +1,4 @@
-const endpoint = 'https://localhost:7198/api/users/request-password-reset';
+import { AUTH_API } from './apiConsts.ts';
 
 interface resetRequestPayload {
 email: string;
@@ -6,7 +6,7 @@ email: string;
 
 export const resetPasswordRequest = async (payload: resetRequestPayload) => {
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(AUTH_API.REQUEST_PASSWORD_RESET, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ interface changePasswordPayload {
     
     export const changePassword = async (payload: changePasswordPayload) => {
       try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(AUTH_API.CHANGE_PASSWORD, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

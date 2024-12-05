@@ -1,4 +1,4 @@
-const endpoint = 'https://localhost:7198/api/users/register';
+import { AUTH_API } from './apiConsts.ts';
 
 interface RegisterPayload {
     fullName: string;
@@ -10,7 +10,7 @@ interface RegisterPayload {
 export const registerRequest = async (payload: RegisterPayload)=> {
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(AUTH_API.REGISTER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

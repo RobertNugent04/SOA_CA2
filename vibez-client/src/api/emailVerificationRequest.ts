@@ -1,4 +1,4 @@
-const endpoint = 'https://localhost:7198/api/users/verify-otp';
+import { AUTH_API } from './apiConsts.ts';
 
 interface EmailVerificationPayload {
   email: string;
@@ -7,7 +7,7 @@ interface EmailVerificationPayload {
 
 export const emailVerificationRequest = async (payload: EmailVerificationPayload) => {
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(AUTH_API.VERIFY_OTP, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

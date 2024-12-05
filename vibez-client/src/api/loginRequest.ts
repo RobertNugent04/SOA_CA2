@@ -1,4 +1,4 @@
-const endpoint = 'https://localhost:7198/api/users/login';
+import { AUTH_API } from './apiConsts.ts';
 
 interface LoginPayload {
   userNameOrEmail: string;
@@ -7,7 +7,7 @@ interface LoginPayload {
 
 export const loginRequest = async (payload: LoginPayload) => {
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(AUTH_API.LOGIN, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

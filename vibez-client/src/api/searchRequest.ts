@@ -1,8 +1,8 @@
-const endpoint = 'https://localhost:7198/api/users/search';
+import { AUTH_API } from './apiConsts.ts';
 
 export const searchUserRequest = async (userName: string) => {
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(AUTH_API.SEARCH, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
