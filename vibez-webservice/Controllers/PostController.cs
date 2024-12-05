@@ -100,6 +100,16 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
                 string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
@@ -127,6 +137,16 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
                 string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
@@ -198,7 +218,14 @@ namespace SOA_CA2.Controllers
 
             if (!allowedExtensions.Contains(fileExtension))
             {
-                throw new ArgumentException("Invalid file type.");
+                throw new ArgumentException("Invalid file type. Only .jpg, .jpeg, .png, and .gif are allowed.");
+            }
+
+            // Validate file size
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
+            if (file.Length > maxFileSize)
+            {
+                throw new ArgumentException("File size exceeds the maximum limit of 10MB.");
             }
 
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder);

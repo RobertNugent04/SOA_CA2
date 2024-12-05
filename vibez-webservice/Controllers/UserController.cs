@@ -462,7 +462,7 @@ namespace SOA_CA2.Controllers
         /// </summary>
         private static bool IsValidEmail(string email)
         {
-            var emailRegex = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+            string emailRegex = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
             return Regex.IsMatch(email, emailRegex);
         }
 
@@ -472,7 +472,7 @@ namespace SOA_CA2.Controllers
         private static bool IsValidPassword(string password)
         {
             // Must contain at least one uppercase, one lowercase, one digit, and one special character.
-            var passwordRegex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+            string passwordRegex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
             return Regex.IsMatch(password, passwordRegex);
         }
     }
