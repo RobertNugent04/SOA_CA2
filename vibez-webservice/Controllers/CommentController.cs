@@ -4,6 +4,7 @@ using SOA_CA2.Models.DTOs.Comment;
 using SOA_CA2.Middleware;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.RegularExpressions;
 
 namespace SOA_CA2.Controllers
 {
@@ -39,6 +40,13 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate input
+                if (postId <= 0)
+                {
+                    _logger.LogWarning("Invalid post ID provided: {PostId}", postId);
+                    return BadRequest(new { Error = "Invalid post ID." });
+                }
+
                 _logger.LogInformation("Fetching comments for post ID: {PostId}", postId);
                 IEnumerable<CommentDto> comments = await _commentService.GetCommentsForPostAsync(postId);
                 return Ok(comments);
@@ -61,6 +69,22 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate input
+                if (dto.PostId <= 0)
+                {
+                    _logger.LogWarning("Invalid post ID provided: {PostId}", dto.PostId);
+                    return BadRequest(new { Error = "Invalid post ID." });
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.Content) || dto.Content.Length > 500)
+                {
+                    _logger.LogWarning("Invalid comment content.");
+                    return BadRequest(new { Error = "Comment content must be between 1 and 500 characters." });
+                }
+
+                // Sanitize content
+                dto.Content = SanitizeInput(dto.Content);
+
                 int userId = GetUserIdFromToken();
                 await _commentService.CreateCommentAsync(userId, dto);
                 return Ok(new { Message = "Comment created successfully." });
@@ -84,6 +108,22 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate input
+                if (commentId <= 0)
+                {
+                    _logger.LogWarning("Invalid comment ID provided: {CommentId}", commentId);
+                    return BadRequest(new { Error = "Invalid comment ID." });
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.Content) || dto.Content.Length > 500)
+                {
+                    _logger.LogWarning("Invalid comment content.");
+                    return BadRequest(new { Error = "Comment content must be between 1 and 500 characters." });
+                }
+
+                // Sanitize content
+                dto.Content = SanitizeInput(dto.Content);
+
                 int userId = GetUserIdFromToken();
                 await _commentService.UpdateCommentAsync(userId, commentId, dto);
                 return Ok(new { Message = "Comment updated successfully." });
@@ -111,6 +151,13 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate input
+                if (commentId <= 0)
+                {
+                    _logger.LogWarning("Invalid comment ID provided: {CommentId}", commentId);
+                    return BadRequest(new { Error = "Invalid comment ID." });
+                }
+
                 int userId = GetUserIdFromToken();
                 await _commentService.DeleteCommentAsync(userId, commentId);
                 return Ok(new { Message = "Comment deleted successfully." });
@@ -140,6 +187,20 @@ namespace SOA_CA2.Controllers
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
             return userId;
+        }
+
+        /// <summary>
+        /// Sanitizes user input to prevent attacks like XSS or SQL injection.
+        /// </summary>
+        /// <param name="input">The user input to sanitize.</param>
+        /// <returns>Sanitized input.</returns>
+        private string SanitizeInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return input;
+
+            // Remove potentially dangerous
+            return Regex.Replace(input, @"<.*?>", string.Empty).Trim();
         }
     }
 }
