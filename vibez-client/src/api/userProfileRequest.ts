@@ -2,7 +2,6 @@ import { AUTH_API } from './apiConsts.ts';
 
 // Function to fetch a user's profile by userId
 type UserProfileResponse = {
-  user: {
     userId: number;
     fullName: string;
     userName: string;
@@ -12,9 +11,7 @@ type UserProfileResponse = {
     createdAt: string;
     isActive: boolean;
   };
-  posts: any[]; 
-  friends: any[]; 
-};
+
 
 export const getUserProfileRequest = async ( token: string, userId: number): Promise<{
   success: boolean;
@@ -22,7 +19,7 @@ export const getUserProfileRequest = async ( token: string, userId: number): Pro
   error?: string;
 }> => {
   try {
-    const response = await fetch(`${AUTH_API.GET_USER}/${userId}/profile`, {
+    const response = await fetch(`${AUTH_API.GET_USER}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

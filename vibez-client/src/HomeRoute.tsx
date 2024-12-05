@@ -32,7 +32,7 @@ export const HomeRoute: React.FC = () => {
 
   return (
     <div className="home-container">
-      <Navbar />
+      <Navbar token={token} currentUserId={currentUserId}/>
       <div className="content-wrapper">
         <div className="posts-container">
           <Posts isUserPage={false} userId={currentUserId ? currentUserId.toString() : ''} />
