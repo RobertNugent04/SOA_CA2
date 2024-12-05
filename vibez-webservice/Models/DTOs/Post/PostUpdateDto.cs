@@ -11,8 +11,8 @@
         public string? Content { get; set; }
 
         /// <summary>
-        /// The updated URL of the image associated with the post.
+        /// The updated file to be associated with the post.
         /// </summary>
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
     }
 }

@@ -19,6 +19,8 @@
 
         INotificationRepository Notifications { get; }
 
+        ICallRepository Calls { get; }
+
         Task SaveChangesAsync();
     }
 }
