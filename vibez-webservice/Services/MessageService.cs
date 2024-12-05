@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Message;
 using SOA_CA2.Models.DTOs.Notification;
+using SOA_CA2.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +21,14 @@ namespace SOA_CA2.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<MessageService> _logger;
         private readonly INotificationService _notificationService;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public MessageService(IUnitOfWork unitOfWork, ILogger<MessageService> logger, INotificationService notificationService)
+        public MessageService(IUnitOfWork unitOfWork, ILogger<MessageService> logger, INotificationService notificationService, IHubContext<MessageHub> messageHub)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _notificationService = notificationService;
+            _messageHub = messageHub;
         }
 
         /// <inheritdoc />
@@ -62,6 +66,21 @@ namespace SOA_CA2.Services
                     ReferenceId = message.MessageId,
                     Message = "sent you a message."
                 });
+
+                // Prepare DTO for real-time communication
+                MessageDto messageDto = new MessageDto
+                {
+                    MessageId = message.MessageId,
+                    SenderId = message.SenderId,
+                    ReceiverId = message.ReceiverId,
+                    Content = message.Content,
+                    CreatedAt = message.CreatedAt
+                };
+
+                // Notify the receiver via SignalR
+                await _messageHub.Clients.User(dto.ReceiverId.ToString()).SendAsync("ReceiveMessage", messageDto);
+
+                _logger.LogInformation("Message sent to the receiver via SignalR.");
             }
             catch (Exception ex)
             {

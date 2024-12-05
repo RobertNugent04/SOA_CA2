@@ -104,5 +104,6 @@ app.UseStaticFiles();
 
 // Map SignalR hub
 app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<MessageHub>("/messageHub");
 
 app.Run();

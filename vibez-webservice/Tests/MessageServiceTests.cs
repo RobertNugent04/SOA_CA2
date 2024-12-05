@@ -6,10 +6,11 @@ using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Message;
 using SOA_CA2.Models.DTOs.Notification;
 using SOA_CA2.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using SOA_CA2.SignalR;
 
 namespace SOA_CA2.Tests
 {
@@ -18,6 +19,9 @@ namespace SOA_CA2.Tests
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<ILogger<MessageService>> _loggerMock;
         private readonly Mock<INotificationService> _notificationServiceMock;
+        private readonly Mock<IHubContext<MessageHub>> _messageHubMock;
+        private readonly Mock<IClientProxy> _clientProxyMock;
+        private readonly Mock<IHubClients> _hubClientsMock;
         private readonly MessageService _messageService;
 
         public MessageServiceTests()
@@ -25,10 +29,19 @@ namespace SOA_CA2.Tests
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _loggerMock = new Mock<ILogger<MessageService>>();
             _notificationServiceMock = new Mock<INotificationService>();
+            _messageHubMock = new Mock<IHubContext<MessageHub>>();
+            _clientProxyMock = new Mock<IClientProxy>();
+            _hubClientsMock = new Mock<IHubClients>();
+
+            // Mock SignalR Client Communication
+            _hubClientsMock.Setup(clients => clients.User(It.IsAny<string>())).Returns(_clientProxyMock.Object);
+            _messageHubMock.Setup(hub => hub.Clients).Returns(_hubClientsMock.Object);
+
             _messageService = new MessageService(
                 _unitOfWorkMock.Object,
                 _loggerMock.Object,
-                _notificationServiceMock.Object);
+                _notificationServiceMock.Object,
+                _messageHubMock.Object);
         }
 
         [Fact]
@@ -70,6 +83,11 @@ namespace SOA_CA2.Tests
                 n.UserId == receiverId &&
                 n.Type == "Message" &&
                 n.Message == "sent you a message.")), Times.Once);
+
+            _hubClientsMock.Verify(clients => clients.User(receiverId.ToString()), Times.Once);
+            _clientProxyMock.Verify(client => client.SendCoreAsync("ReceiveMessage",
+                It.Is<object[]>(args => args.Length == 1 && ((MessageDto)args[0]).Content == "Hello"),
+                default), Times.Once);
         }
 
         [Fact]
@@ -92,6 +110,7 @@ namespace SOA_CA2.Tests
                 _messageService.SendMessageAsync(senderId, messageDto));
 
             _notificationServiceMock.Verify(n => n.SendNotificationAsync(It.IsAny<int>(), It.IsAny<NotificationCreationDto>()), Times.Never);
+            _hubClientsMock.Verify(clients => clients.User(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
