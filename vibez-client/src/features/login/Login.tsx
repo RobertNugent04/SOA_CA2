@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginRequest } from "../../api/loginRequest.ts";
 
 export const Login = () => {
-  const [email, setEmail] = useState("");
+  const [userNameOrEmail, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -13,15 +13,24 @@ export const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const payload = { email, password };
+    const payload = { userNameOrEmail, password };
 
-    const result = await loginRequest(payload);
+    try {
+      const response = await loginRequest(payload); 
 
-    if (result.success) {
-      console.log("Login successful:", result.data);
-      navigate("/home");
-    } else {
-      setError(result.message || "Login failed. Please try again.");
+      console.log(payload);
+
+      if (response) {
+        // On successful registration, redirect to email verification page
+        //store email in state
+        console.log(response);
+        console.log("email:", userNameOrEmail);
+        console.log("pass:", password);
+        console.log("Login successful:", response.data);
+        navigate("/home", { state: {  } });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -38,7 +47,7 @@ export const Login = () => {
               id="email"
               placeholder="Enter your email"
               className="input-field"
-              value={email}
+              value={userNameOrEmail}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
@@ -60,6 +69,10 @@ export const Login = () => {
         </form>
         <p className="signup-text">
           Haven't got an account? <Link to="/register" className="signup-link">Sign Up</Link>
+        </p>
+
+        <p className="forgot-password">
+          Forgotten your Password? <Link to="/reset-request" className="signup-link">Click Here</Link>
         </p>
       </div>
     </div>

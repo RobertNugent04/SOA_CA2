@@ -20,8 +20,11 @@ export const EmailVerification = () => {
     try {
       const result = await emailVerificationRequest(payload);
 
-      if (result.success) {
+      if (result) {
+        console.log(email);
         console.log("OTP verified successfully.");
+        console.log(result);
+
         navigate("/"); 
       } else {
         setError(result.message || "Failed to verify OTP.");

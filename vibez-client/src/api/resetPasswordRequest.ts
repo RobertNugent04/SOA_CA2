@@ -1,11 +1,10 @@
-const endpoint = 'https://localhost:7198/api/users/login';
+const endpoint = 'https://localhost:7198/api/users/request-password-reset';
 
-interface LoginPayload {
-  userNameOrEmail: string;
-  password: string;
+interface resetRequestPayload {
+email: string;
 }
 
-export const loginRequest = async (payload: LoginPayload) => {
+export const resetPasswordRequest = async (payload: resetRequestPayload) => {
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -17,15 +16,15 @@ export const loginRequest = async (payload: LoginPayload) => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Login successful:', data);
+      console.log('request successful:', data);
       return { success: true, data };
     } else {
       const errorData = await response.json();
-      console.error('Login error:', errorData);
-      return { success: false, message: errorData.message || 'Login failed.' };
+      console.error('request error:', errorData);
+      return { success: false, message: errorData.message || 'request failed.' };
     }
   } catch (error) {
-    console.error('Error during login request:', error);
+    console.error('Error during reset request:', error);
     return { success: false, message: 'An unexpected error occurred.' };
   }
 };

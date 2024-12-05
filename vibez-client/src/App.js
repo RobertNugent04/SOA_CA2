@@ -5,6 +5,7 @@ import { HomeRoute } from "./HomeRoute.tsx";
 import { UserRoute } from "../src/features/user/UserRoute.tsx";
 import { Register } from "../src/features/register/Register.tsx";
 import { EmailVerification } from "./features/register/EmailVerification.tsx";
+import { ForgotPassword } from "./features/forgotPassword/ForgotPassword.tsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/home" element={<HomeRoute />} />
         <Route path="/user" element={<UserRoute />} />
         <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/reset-request" element={<ForgotPassword/>} />
       </Routes>
     </Router>
   );
