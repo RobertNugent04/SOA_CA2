@@ -1,8 +1,13 @@
 ﻿namespace SOA_CA2.Models.DTOs.Message
 {
-	// Used for updating a message 
-	public class MessageUpdateDto
-	{
-		public string? Content { get; set; }
-	}
+    /// <summary>
+    /// DTO used for updating an existing message.
+    /// </summary>
+    public class MessageUpdateDto
+    {
+        /// <summary>
+        /// The updated content of the message.
+        /// </summary>
+        public string? Content { get; set; }
+    }
 }
