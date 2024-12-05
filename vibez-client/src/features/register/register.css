@@ -1,0 +1,15 @@
+.names {
+    display: flex;
+    justify-content: space-between;
+    margin-right: -370px;
+    width: 100%;
+  }
+  
+  .names .input-field {
+    width: 80%; 
+  }
+
+.info{
+    margin-bottom: 1rem;
+    margin-left: 90px;
+}
