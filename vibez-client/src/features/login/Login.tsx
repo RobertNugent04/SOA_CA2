@@ -20,7 +20,7 @@ export const Login = () => {
 
       console.log(payload);
 
-      if (response) {
+      if (response.success) {
         // On successful registration, redirect to email verification page
         //store email in state
         console.log(response);

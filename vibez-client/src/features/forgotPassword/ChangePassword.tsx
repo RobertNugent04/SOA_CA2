@@ -50,7 +50,7 @@ export const ChangePassword = (payload: { email: string; otp: string; password: 
     try {
       const response = await changePassword(payload);
   
-      if (response) {
+      if (response.success) {
         // On successful password change, redirect to the home page
         navigate("/");
       }

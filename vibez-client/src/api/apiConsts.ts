@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_DEV_API_BASE;
+const API_BASE_URL = 'https://localhost:7198'
 
 export default API_BASE_URL;
 
@@ -9,6 +9,7 @@ export const AUTH_API = {
   VERIFY_OTP: `${API_BASE_URL}/api/users/verify-otp`,
   REGISTER: `${API_BASE_URL}/api/users/register`,
   REQUEST_PASSWORD_RESET: `${API_BASE_URL}/api/users/request-password-reset`,
+  SEARCH: `${API_BASE_URL}/api/users/search`,
 };
 
 
