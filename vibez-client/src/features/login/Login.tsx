@@ -27,7 +27,9 @@ export const Login = () => {
         console.log("email:", userNameOrEmail);
         console.log("pass:", password);
         console.log("Login successful:", response.data);
-        navigate("/home", { state: {  } });
+        const token = response.data.token;
+        console.log("token: ", token);
+        navigate("/home", { state: { token } });
       }
     } catch (error) {
       console.log(error);
