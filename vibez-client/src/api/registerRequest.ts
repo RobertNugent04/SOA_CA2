@@ -1,4 +1,4 @@
-const endpoint = 'https://localhost:7198/api/users/register';
+const endpoint = 'http://localhost:5225/api/users/register';
 
 interface RegisterPayload {
     fullName: string;
