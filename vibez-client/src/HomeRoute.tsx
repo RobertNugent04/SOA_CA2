@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Posts } from './features/posts/Posts.tsx';
 import { Navbar } from './features/navbar/Navbar.tsx';
 import { MessageTab } from './features/messageTab/MessageTab.tsx';
-import { getProfileRequest } from './api/getProfile.ts'; // Assuming the getProfile API request is defined here
+import { getUserProfileRequest } from './api/userProfileRequest.ts'; // Assuming the getProfile API request is defined here
 import { useLocation } from 'react-router-dom';
 
 export const HomeRoute: React.FC = () => {
@@ -15,7 +15,7 @@ export const HomeRoute: React.FC = () => {
       // Replace this with your token retrieval logic
 
       if (token) {
-        const response = await getProfileRequest(token);
+        const response = await getUserProfileRequest(token);
 
         if (response.success && response.data) {
           setCurrentUserId(response.data.userId); 

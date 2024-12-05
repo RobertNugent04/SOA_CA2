@@ -29,7 +29,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId }) => {
     {
       id: 2,
       author: 'John Doe',
-      userId: '2',
+      userId: '21',
       profilePic: 'https://i.pinimg.com/736x/14/e1/c7/14e1c7bf5162b659c62dd57250373c07.jpg',
       date: 'Dec 5',
       content: 'Had a great weekend camping!',

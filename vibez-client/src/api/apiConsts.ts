@@ -14,7 +14,8 @@ export const AUTH_API = {
 
 export const USER_API = {
   
-    GET_USER: `${API_BASE_URL}/api/users/profile`,
+    GET_USER: (userId: number) => `${API_BASE_URL}/api/users/${userId}/profile`,
+    GET_CURRENT_USER: `${API_BASE_URL}/api/users/profile`,
     UPDATE_USER: `${API_BASE_URL}/api/users/profile`,
 
 };

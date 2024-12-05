@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { getProfileRequest } from "../../api/getProfile.ts";
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
-import { getProfileRequest } from "../../api/getProfile.ts";
 import { EditUser } from "./EditUser.tsx";
 import API_BASE_URL from "../../api/apiConsts.ts";
 
-type UserCardProps = {
-  token: string;
-  userId: number;
-};
-
-type UserProfileResponse = {
+type UserProfile = {
   userId: number;
   fullName: string;
   userName: string;
@@ -22,60 +16,67 @@ type UserProfileResponse = {
   isActive: boolean;
 };
 
+type Post = {
+  postId: number;
+  userId: number;
+  content: string;
+  imageUrl: string | null;
+  createdAt: string;
+};
+
+type Friend = {
+  friendshipId: number;
+  userId: number;
+  friendId: number;
+  status: string;
+};
+
+type UserProfileResponse = {
+  user: UserProfile;
+  posts: Post[];
+  friends: Friend[];
+};
+
+type UserCardProps = {
+  token: string;
+  userId: number;
+};
+
 export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
-  const [user, setUser] = useState<UserProfileResponse | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [user_, setUser] = useState<UserProfileResponse | null>(null);
   const [isEditing, setIsEditing] = useState(false); // State to toggle EditUser component
-  const location = useLocation();
 
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
-      setError(null);
-
       try {
-        console.log("UserCard token: ", token);
         const response = await getProfileRequest(token, userId);
-        console.log("UserCard response: ", response);
-
-        if (response.success && response.data) {
-          const userProfile: UserProfileResponse = response.data;
-          setUser({
-            userId: userProfile.userId,
-            fullName: userProfile.fullName,
-            userName: userProfile.userName,
-            email: userProfile.email,
-            bio: userProfile.bio,
-            profilePicturePath: userProfile.profilePicturePath || profilePic,
-            createdAt: new Date(userProfile.createdAt).toLocaleDateString(),
-            isActive: userProfile.isActive,
-          });
-          
+        if (response.success) {
+          setUserProfile(response.data!);
+          console.log("After setting user profile: ", userProfile);
         } else {
           setError(response.error || "Failed to fetch user data.");
         }
       } catch (err) {
-        setError(err as string);
+        setError("An error occurred while fetching the profile.");
       }
-
       setLoading(false);
     };
 
     fetchUser();
-  }, [userId]);
+  }, [token, userId]);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  if (!userProfile) return <p>No user data available.</p>;
 
-  if (!user) {
-    return <p>User not found.</p>;
-  }
+  const { user, posts, friends } = userProfile;
+
+  console.log("User profile: ", userProfile.user.fullName);
 
   const handleSave = (updatedData: { fullName: string; bio: string; profilePicture?: File | null }) => {
     console.log("Saved Data:", updatedData);
@@ -107,7 +108,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
           fullName={user.fullName}
           bio={user.bio}
           onSave={handleSave}
-          onClose={() => setIsEditing(false)} // Close modal when Cancel or outside overlay is clicked
+          onClose={() => setIsEditing(false)} 
           token={token}/>
       )}
     </div>
