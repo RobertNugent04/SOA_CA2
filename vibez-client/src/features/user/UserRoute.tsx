@@ -22,7 +22,7 @@ export const UserRoute: React.FC = () => {
         <div className="posts-container">
           <UserCard token={token} userId={userId} /> {/* Pass userId to UserCard */}
           <div className="posts">
-            <Posts isUserPage={true} userId={userId.toString()} /> {/* Use dynamic userId */}
+            <Posts isUserPage={true} userId={userId.toString()} token={token} /> {/* Use dynamic userId */}
           </div>
         </div>
         <div className="messages-container">

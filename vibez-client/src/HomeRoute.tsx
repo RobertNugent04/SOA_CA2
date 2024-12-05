@@ -35,7 +35,7 @@ export const HomeRoute: React.FC = () => {
       <Navbar token={token} currentUserId={currentUserId}/>
       <div className="content-wrapper">
         <div className="posts-container">
-          <Posts isUserPage={false} userId={currentUserId ? currentUserId.toString() : ''} />
+          <Posts isUserPage={false} userId={currentUserId ? currentUserId : 0} token={token} />
         </div>
         <div className="messages-container">
           <MessageTab currentUserId={currentUserId} />

@@ -26,7 +26,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
   const [user, setUser] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle EditUser component
+  const [isEditing, setIsEditing] = useState(false); 
   const location = useLocation();
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
           fullName={user.fullName}
           bio={user.bio}
           onSave={handleSave}
-          onClose={() => setIsEditing(false)} // Close modal when Cancel or outside overlay is clicked
+          onClose={() => setIsEditing(false)} 
           token={token}/>
       )}
     </div>
