@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SOA_CA2.Models;
+using SOA_CA2.Infrastructure;
 
 #nullable disable
 
@@ -22,45 +22,91 @@ namespace SOA_CA2.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SOA_CA2.Models.Comment", b =>
+            modelBuilder.Entity("SOA_CA2.Models.Call", b =>
                 {
-                    b.Property<int>("Comment_ID")
+                    b.Property<int>("CallId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Comment_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CallId"));
+
+                    b.Property<string>("CallStatus")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
+                    b.Property<string>("CallType")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("CallerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("EndedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.HasKey("CallId");
+
+                    b.HasIndex("CallerId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.ToTable("Calls");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CommentId"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
 
-                    b.Property<int>("Post_ID")
+                    b.Property<int>("PostId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Comment_ID");
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("SOA_CA2.Models.Friend", b =>
+            modelBuilder.Entity("SOA_CA2.Models.Friendship", b =>
                 {
-                    b.Property<int>("Friend_ID")
+                    b.Property<int>("FriendshipId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Friend_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FriendshipId"));
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
 
-                    b.Property<int>("Friend_User_ID")
+                    b.Property<int>("FriendId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Status")
@@ -68,129 +114,165 @@ namespace SOA_CA2.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Friend_ID");
+                    b.HasKey("FriendshipId");
 
-                    b.ToTable("Friend");
+                    b.HasIndex("FriendId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Friendships");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.Like", b =>
                 {
-                    b.Property<int>("Like_ID")
+                    b.Property<int>("LikeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Like_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LikeId"));
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
 
-                    b.Property<int>("Post_ID")
+                    b.Property<int>("PostId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Like_ID");
+                    b.HasKey("LikeId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.Message", b =>
                 {
-                    b.Property<int>("Message_ID")
+                    b.Property<int>("MessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Message_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Receiver_User_ID")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("IsDeletedByReceiver")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeletedBySender")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ReceiverId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Sender_User_ID")
+                    b.Property<int>("SenderId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Sent_At")
-                        .HasColumnType("timestamp");
+                    b.HasKey("MessageId");
 
-                    b.HasKey("Message_ID");
+                    b.HasIndex("ReceiverId");
 
-                    b.ToTable("Message");
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.Notification", b =>
                 {
-                    b.Property<int>("Notification_ID")
+                    b.Property<int>("NotificationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Notification_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationId"));
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int?>("ReferenceId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Notification_ID");
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
 
-                    b.ToTable("Notification");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.Post", b =>
                 {
-                    b.Property<int>("Post_ID")
+                    b.Property<int>("PostId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Post_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PostId"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
 
-                    b.Property<string>("Image_URL")
+                    b.Property<string>("ImageUrl")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime?>("Updated_At")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamptz");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Post_ID");
+                    b.HasKey("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("SOA_CA2.Models.User", b =>
                 {
-                    b.Property<int>("User_ID")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("User_ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Bio")
                         .HasMaxLength(500)
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created_At")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamptz");
 
                     b.Property<string>("Email")
@@ -198,30 +280,178 @@ namespace SOA_CA2.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("Full_Name")
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("varchar(150)");
 
-                    b.Property<string>("Password")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Profile_Pic")
+                    b.Property<string>("ProfilePicturePath")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime?>("Updated_At")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamptz");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.HasKey("User_ID");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Call", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.User", "Caller")
+                        .WithMany("CallsMade")
+                        .HasForeignKey("CallerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SOA_CA2.Models.User", "Receiver")
+                        .WithMany("CallsReceived")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Caller");
+
+                    b.Navigation("Receiver");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Comment", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SOA_CA2.Models.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Friendship", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.User", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SOA_CA2.Models.User", "User")
+                        .WithMany("Friendships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Friend");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Like", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SOA_CA2.Models.User", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Message", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.User", "Receiver")
+                        .WithMany("MessagesReceived")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SOA_CA2.Models.User", "Sender")
+                        .WithMany("MessagesSent")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Notification", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Post", b =>
+                {
+                    b.HasOne("SOA_CA2.Models.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.Post", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("SOA_CA2.Models.User", b =>
+                {
+                    b.Navigation("CallsMade");
+
+                    b.Navigation("CallsReceived");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Friendships");
+
+                    b.Navigation("Likes");
+
+                    b.Navigation("MessagesReceived");
+
+                    b.Navigation("MessagesSent");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

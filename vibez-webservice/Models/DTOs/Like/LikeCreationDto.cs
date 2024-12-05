@@ -1,8 +1,13 @@
 ﻿namespace SOA_CA2.Models.DTOs.Like
 {
-	// Used for creating a new like
-	public class LikeCreationDto
-	{
-		public int Post_ID { get; set; }
-	}
+    /// <summary>
+    /// DTO used for creating a new like.
+    /// </summary>
+    public class LikeCreationDto
+    {
+        /// <summary>
+        /// The ID of the post to be liked.
+        /// </summary>
+        public int PostId { get; set; }
+    }
 }
