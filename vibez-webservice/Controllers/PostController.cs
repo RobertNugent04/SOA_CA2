@@ -49,15 +49,19 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Retrieves all posts for the authenticated user with pagination.
+        /// Retrieves all posts for the userId with pagination.
         /// </summary>
         [AuthorizeUser]
-        [HttpGet("user-posts")]
-        public async Task<IActionResult> GetPosts(int pageNumber = 1, int pageSize = 10)
+        [HttpGet("user-posts/{userId}")]
+        public async Task<IActionResult> GetPosts(int userId, int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                int userId = GetUserIdFromToken();
+                if (userId <= 0)
+                {
+                    _logger.LogWarning("Invalid userId in status request.");
+                    return BadRequest(new { Error = "Invalid userId." });
+                }
                 IEnumerable<PostDTO> posts = await _postService.GetPostsAsync(userId, pageNumber, pageSize);
                 return Ok(posts);
             }
