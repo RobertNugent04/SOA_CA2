@@ -46,6 +46,8 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId }) => {
     },
   ];
 
+  console.log("userId: ", userId);
+
   // Filter posts based on the isUserPage prop and userId
   const filteredPosts = isUserPage
     ? posts.filter((post) => post.userId === userId) // Show only posts by the user if isUserPage is true

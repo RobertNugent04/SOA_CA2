@@ -2,7 +2,7 @@ import { AUTH_API } from './apiConsts.ts';
 
 // Function to fetch the user profile
 type ProfileResponse = {
-  userId: string;
+    userId: number;
   fullName: string;
   userName: string;
   email: string;
@@ -26,6 +26,8 @@ export const getProfileRequest = async (token: string): Promise<{
       },
     });
 
+    console.log('Response:', response);
+
     if (response.ok) {
       const data: ProfileResponse = await response.json();
       console.log('Profile fetched successfully:', data);
@@ -35,7 +37,7 @@ export const getProfileRequest = async (token: string): Promise<{
       try {
         errorData = await response.json();
       } catch {
-        errorData = await response.text(); // Handle non-JSON error responses
+        errorData = await response.text(); 
       }
       console.error('Error fetching profile:', errorData);
       return { success: false, error: errorData };
