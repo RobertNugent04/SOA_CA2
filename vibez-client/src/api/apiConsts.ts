@@ -23,6 +23,7 @@ export const USER_API = {
 export const POST_API = {
 
     GET_USER_POSTS: (userId: number) => `${API_BASE_URL}/api/posts/user-posts/${userId}`,
+    GET_FEED: `${API_BASE_URL}/api/posts/activity-feed`,
 
 };
 
