@@ -3,13 +3,13 @@ import { useLocation } from "react-router-dom";
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
 import { getUserProfileRequest } from "../../api/userProfileRequest.ts";
+import { EditUser } from "./EditUser.tsx";
 
 type UserCardProps = {
   token: string;
   userId: number;
 };
 
-// Function to fetch a user's profile by userId
 type UserProfileResponse = {
   userId: number;
   fullName: string;
@@ -22,9 +22,10 @@ type UserProfileResponse = {
 };
 
 export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false); // State to toggle EditUser component
   const location = useLocation();
 
   useEffect(() => {
@@ -33,8 +34,8 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
       setError(null);
 
       try {
-        console.log("UserCard token: ", token)
-        const response = await getUserProfileRequest(token, userId); 
+        console.log("UserCard token: ", token);
+        const response = await getUserProfileRequest(token, userId);
         console.log("UserCard response: ", response);
 
         if (response.success && response.data) {
@@ -45,7 +46,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
             userName: userProfile.userName,
             email: userProfile.email,
             bio: userProfile.bio,
-            profilePicturePath: userProfile.profilePicturePath || profilePic, 
+            profilePicturePath: userProfile.profilePicturePath || profilePic,
             createdAt: new Date(userProfile.createdAt).toLocaleDateString(),
             isActive: userProfile.isActive,
           });
@@ -53,14 +54,14 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
           setError(response.error || "Failed to fetch user data.");
         }
       } catch (err) {
-        setError(err);
+        setError(err as string);
       }
 
       setLoading(false);
     };
 
     fetchUser();
-  }, [userId]); // Re-run effect if userId changes
+  }, [userId]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -74,15 +75,36 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
     return <p>User not found.</p>;
   }
 
+  const handleSave = (updatedData: { fullName: string; bio: string; profilePicture: File | null }) => {
+    console.log("Saved Data:", updatedData);
+    setUser((prevUser) => ({
+      ...prevUser!,
+      fullName: updatedData.fullName,
+      bio: updatedData.bio,
+    }));
+    setIsEditing(false);
+  };
+
   return (
     <div className="user-card">
-      <img src={profilePic} alt="profile" className="profile-picture" />
+      <img src={user.profilePicturePath || profilePic} alt="profile" className="profile-picture" />
       <div className="current-user-info">
         <h2 className="username">{user.userName}</h2>
         <p className="join-date">Joined {user.createdAt}</p>
         <p className="bio">{user.bio || "No bio available."}</p>
       </div>
-      <button className="edit-profile-button">Edit Profile</button>
+      <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
+        Edit Profile
+      </button>
+
+      {isEditing && (
+  <EditUser
+  fullName={user.fullName}
+  bio={user.bio}
+  onSave={handleSave}
+  onClose={() => setIsEditing(false)} // Close modal when Cancel or outside overlay is clicked
+/>
+      )}
     </div>
   );
 };
