@@ -130,7 +130,7 @@ namespace SOA_CA2.Services
                 _logger.LogInformation("Logging in user: {UsernameOrEmail}", dto.UserNameOrEmail);
 
                 User? user = await _unitOfWork.Users.FindByUsernameOrEmailAsync(dto.UserNameOrEmail);
-                if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.PasswordHash))
+                if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.PasswordHash) || !user.IsActive)
                 {
                     throw new UnauthorizedAccessException("Invalid credentials.");
                 }

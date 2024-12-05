@@ -11,8 +11,8 @@
         public required string Content { get; set; }
 
         /// <summary>
-        /// The URL of the image associated with the post.
+        /// The profile picture file to be uploaded.
         /// </summary>
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
     }
 }

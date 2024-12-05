@@ -27,6 +27,7 @@ namespace SOA_CA2
             Friendships = new FriendshipRepository(context, loggerFactory.CreateLogger<FriendshipRepository>());
             Messages = new MessageRepository(context, loggerFactory.CreateLogger<MessageRepository>());
             Notifications = new NotificationRepository(context, loggerFactory.CreateLogger<NotificationRepository>());
+            Calls = new CallRepository(context, loggerFactory.CreateLogger<CallRepository>());
         }
 
         /// <inheritdoc />
@@ -49,6 +50,8 @@ namespace SOA_CA2
 
         /// <inheritdoc />
         public INotificationRepository Notifications { get; }
+
+        public ICallRepository Calls { get; }
 
         /// <inheritdoc />
         public async Task SaveChangesAsync()

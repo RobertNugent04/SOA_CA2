@@ -92,7 +92,7 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Creates a new post.
+        /// Creates a new post with an optional image.
         /// </summary>
         [AuthorizeUser]
         [HttpPost]
@@ -101,10 +101,15 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                string? imagePath = SaveImage(Request.Form.Files["ImageFile"], "posts-images");
+                string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
                 await _postService.CreatePostAsync(userId, dto, imagePath);
                 return Ok(new { Message = "Post created successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid image file.");
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,7 +119,7 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Updates an existing post.
+        /// Updates an existing post with optional content and image update.
         /// </summary>
         [AuthorizeUser]
         [HttpPut("{postId}")]
@@ -123,7 +128,7 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                string? imagePath = SaveImage(Request.Form.Files["ImageFile"], "posts-images");
+                string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
                 await _postService.UpdatePostAsync(userId, postId, dto, imagePath);
                 return Ok(new { Message = "Post updated successfully." });
@@ -132,9 +137,14 @@ namespace SOA_CA2.Controllers
             {
                 return Unauthorized(new { Error = ex.Message });
             }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid image file.");
+                return BadRequest(new { Error = ex.Message });
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating post ID: {PostId}", postId);
+                _logger.LogError(ex, "Error updating post.");
                 return StatusCode(500, new { Error = ex.Message });
             }
         }
@@ -183,7 +193,7 @@ namespace SOA_CA2.Controllers
         {
             if (file == null) return null;
 
-            string[] allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
             string fileExtension = Path.GetExtension(file.FileName).ToLower();
 
             if (!allowedExtensions.Contains(fileExtension))
@@ -194,7 +204,7 @@ namespace SOA_CA2.Controllers
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder);
             Directory.CreateDirectory(uploadsFolder);
 
-            string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+            string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
