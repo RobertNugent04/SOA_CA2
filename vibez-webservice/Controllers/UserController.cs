@@ -5,6 +5,7 @@ using SOA_CA2.Models.DTOs.OtpVerification;
 using SOA_CA2.Models.DTOs.User;
 using SOA_CA2.Middleware;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace SOA_CA2.Controllers
 {
@@ -35,6 +36,29 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate email format
+                if (!IsValidEmail(dto.Email))
+                {
+                    return BadRequest(new { Error = "Invalid email format." });
+                }
+
+                // Validate username length
+                if (dto.UserName.Length < 3 || dto.UserName.Length > 20)
+                {
+                    return BadRequest(new { Error = "Username must be between 3 and 20 characters." });
+                }
+
+                // Validate password strength
+                if (!IsValidPassword(dto.Password))
+                {
+                    return BadRequest(new { Error = "Password must contain at least 8 characters, including uppercase, lowercase, digit, and special character." });
+                }
+
+                // Sanitize inputs
+                dto.Email = dto.Email.Trim();
+                dto.UserName = dto.UserName.Trim();
+                dto.Password = dto.Password.Trim();
+
                 _logger.LogInformation("Registering a new user with email: {Email}", dto.Email);
                 await _userService.RegisterAsync(dto);
                 _logger.LogInformation("User registered successfully.");
@@ -60,6 +84,14 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate email format
+                if (!IsValidEmail(dto.Email))
+                {
+                    return BadRequest(new { Error = "Invalid email format." });
+                }
+
+                dto.Email = dto.Email.Trim();
+
                 _logger.LogInformation("Verifying OTP for email: {Email}", dto.Email);
                 await _userService.VerifyOtpAsync(dto.Email, dto.Otp);
                 _logger.LogInformation("OTP verified successfully.");
@@ -85,6 +117,10 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                //trim inputs
+                dto.UserNameOrEmail = dto.UserNameOrEmail.Trim();
+                dto.Password = dto.Password.Trim();
+
                 _logger.LogInformation("Logging in user with username/email: {UserNameOrEmail}", dto.UserNameOrEmail);
                 string? token = await _userService.LoginAsync(dto);
                 _logger.LogInformation("User logged in successfully.");
@@ -123,6 +159,16 @@ namespace SOA_CA2.Controllers
                 {
                     _logger.LogWarning("Invalid user ID in token during profile update.");
                     return Unauthorized(new { Error = "Invalid user." });
+                }
+
+                // Input validation for fields
+                if (!string.IsNullOrWhiteSpace(dto.FullName) && dto.FullName.Length > 50)
+                {
+                    return BadRequest(new { Error = "Full name cannot exceed 50 characters." });
+                }
+                if (!string.IsNullOrWhiteSpace(dto.Bio) && dto.Bio.Length > 200)
+                {
+                    return BadRequest(new { Error = "Bio cannot exceed 200 characters." });
                 }
 
                 string? profilePicturePath = null;
@@ -261,6 +307,15 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate email format
+                if (!IsValidEmail(request.Email))
+                {
+                    return BadRequest(new { Error = "Invalid email format." });
+                }
+
+                // Sanitize inputs
+                request.Email = request.Email.Trim();
+
                 _logger.LogInformation("Password reset request for email: {Email}", request.Email);
                 await _userService.RequestPasswordResetAsync(request.Email);
                 _logger.LogInformation("OTP sent for password reset to email: {Email}", request.Email);
@@ -286,6 +341,22 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate email format
+                if (!IsValidEmail(request.Email))
+                {
+                    return BadRequest(new { Error = "Invalid email format." });
+                }
+
+                // Validate password strength
+                if (!IsValidPassword(request.NewPassword))
+                {
+                    return BadRequest(new { Error = "Password must contain at least 8 characters, including uppercase, lowercase, digit, and special character." });
+                }
+
+                // Sanitize inputs
+                request.Email = request.Email.Trim();
+                request.NewPassword = request.NewPassword.Trim();
+
                 _logger.LogInformation("Password reset attempt for email: {Email}", request.Email);
                 await _userService.VerifyOtpAndResetPasswordAsync(request.Email, request.Otp, request.NewPassword);
                 _logger.LogInformation("Password reset successfully for email: {Email}", request.Email);
@@ -341,6 +412,9 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                //sanitize input
+                query = query.Trim();
+
                 _logger.LogInformation("Searching for users with query: {Query}", query);
                 IEnumerable<UserDTO> users = await _userService.SearchUsersAsync(query);
                 _logger.LogInformation("Found {UserCount} users for query: {Query}", users.Count(), query);
@@ -381,6 +455,25 @@ namespace SOA_CA2.Controllers
                 _logger.LogError(ex, "An unexpected error occurred while fetching profile for user ID: {UserId}", userId);
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
+        }
+
+        /// <summary>
+        /// Validates email format.
+        /// </summary>
+        private static bool IsValidEmail(string email)
+        {
+            var emailRegex = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+            return Regex.IsMatch(email, emailRegex);
+        }
+
+        /// <summary>
+        /// Validates password strength.
+        /// </summary>
+        private static bool IsValidPassword(string password)
+        {
+            // Must contain at least one uppercase, one lowercase, one digit, and one special character.
+            var passwordRegex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+            return Regex.IsMatch(password, passwordRegex);
         }
     }
 }
