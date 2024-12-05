@@ -60,6 +60,7 @@ namespace SOA_CA2.Repositories
                     .OrderByDescending(p => p.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
+                    .Include(p => p.User)
                     .ToListAsync();
             }
             catch (Exception ex)
