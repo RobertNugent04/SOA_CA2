@@ -49,6 +49,20 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IOtpCacheManager, OtpCacheManager>(); // Singleton for caching OTPs
 builder.Services.AddScoped<PasswordHasher>();
 
+// Configure CORS using configuration
+string[]? allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowConfiguredOrigins", policy =>
+    {
+        policy.WithOrigins(allowedOrigins) // Use allowed origins from configuration
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -93,6 +107,9 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<JwtMiddleware>();
 
+// Apply the CORS policy
+app.UseCors("AllowConfiguredOrigins");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -104,5 +121,6 @@ app.UseStaticFiles();
 
 // Map SignalR hub
 app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<MessageHub>("/messageHub");
 
 app.Run();
