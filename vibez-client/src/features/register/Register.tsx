@@ -11,16 +11,16 @@ export const Register = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // For loading state
-  const [errorMessage, setErrorMessage] = useState(""); // For error messages
+  const [loading, setLoading] = useState(false); 
+  const [errorMessage, setErrorMessage] = useState(""); 
 
-  const navigate = useNavigate(); // Hook for redirection
+  const navigate = useNavigate(); 
 
   // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setLoading(true); // Set loading state to true when submitting
+    setLoading(true); 
 
     const payload = {
       fullName,
@@ -30,15 +30,15 @@ export const Register = () => {
     };
 
     try {
-      const response = await registerRequest(payload); // Call the API function
+      const response = await registerRequest(payload); 
 
       if (response) {
         // On successful registration, redirect to email verification page
-        navigate("/email-verification"); // Assuming your route is `/email-verification`
+        navigate("/email-verification"); 
       }
     } catch (error) {
       setLoading(false);
-      setErrorMessage("An error occurred. Please try again."); // Set error message on failure
+      setErrorMessage("An error occurred. Please try again."); 
     }
   };
 
@@ -56,7 +56,7 @@ export const Register = () => {
                 placeholder="Enter your full name"
                 className="input-field"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)} // Handle input change
+                onChange={(e) => setFullName(e.target.value)} 
                 required
               />
             </div>
@@ -67,7 +67,7 @@ export const Register = () => {
                 placeholder="Enter your username"
                 className="input-field"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)} // Handle input change
+                onChange={(e) => setUserName(e.target.value)} 
                 required
               />
             </div>
@@ -80,7 +80,7 @@ export const Register = () => {
               placeholder="Enter your email"
               className="input-field"
               value={email}
-              onChange={(e) => setEmail(e.target.value)} // Handle input change
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -92,7 +92,7 @@ export const Register = () => {
               placeholder="Enter your password"
               className="input-field"
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Handle input change
+              onChange={(e) => setPassword(e.target.value)} 
               required
             />
           </div>

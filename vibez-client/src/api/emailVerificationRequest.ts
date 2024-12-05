@@ -1,4 +1,4 @@
-const endpoint = 'http://localhost:5225/api/users/verify-otp';
+const endpoint = 'https://localhost:7198/api/users/verify-otp';
 
 interface EmailVerificationPayload {
   email: string;

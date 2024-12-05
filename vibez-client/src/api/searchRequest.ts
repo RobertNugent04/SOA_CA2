@@ -1,4 +1,4 @@
-const endpoint = 'http://localhost:5225/api/users/search';
+const endpoint = 'https://localhost:7198/api/users/search';
 
 export const searchUserRequest = async (userName: string) => {
   try {
