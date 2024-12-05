@@ -19,3 +19,7 @@ wwwroot/profile-pictures/
 
 #Posts Images
 wwwroot/posts-images/
+
+#Publish profiles
+.config/
+Properties/

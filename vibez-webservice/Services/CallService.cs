@@ -42,6 +42,12 @@ namespace SOA_CA2.Services
             {
                 _logger.LogInformation("User {CallerId} is initiating a {CallType} call to {ReceiverId}.", callerId, dto.CallType, dto.ReceiverId);
 
+                // prevent users from calling themselves
+                if (callerId == dto.ReceiverId)
+                {
+                    throw new ArgumentException("Users cannot call themselves.");
+                }
+
                 // Create a new call record
                 Call call = new Call
                 {
@@ -68,6 +74,11 @@ namespace SOA_CA2.Services
                 _logger.LogInformation("Call initiated successfully with CallId: {CallId}.", call.CallId);
 
                 return _mapper.Map<CallDto>(call);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid call initiation request.");
+                throw;
             }
             catch (Exception ex)
             {

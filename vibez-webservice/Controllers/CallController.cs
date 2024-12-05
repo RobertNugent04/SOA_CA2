@@ -35,8 +35,25 @@ namespace SOA_CA2.Controllers
             try
             {
                 int callerId = GetUserIdFromToken();
+
+                // Prevent users from calling themselves
+                if (callerId == dto.ReceiverId)
+                {
+                    return BadRequest(new { Error = "Users cannot call themselves." });
+                }
+
                 CallDto call = await _callService.InitiateCallAsync(callerId, dto);
                 return Ok(call);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid request while initiating call.");
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access during call initiation.");
+                return Unauthorized(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -57,6 +74,16 @@ namespace SOA_CA2.Controllers
                 int userId = GetUserIdFromToken();
                 await _callService.UpdateCallStatusAsync(callId, userId, dto);
                 return Ok(new { Message = "Call status updated successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid request while updating call status.");
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access during call status update.");
+                return Unauthorized(new { Error = ex.Message });
             }
             catch (Exception ex)
             {

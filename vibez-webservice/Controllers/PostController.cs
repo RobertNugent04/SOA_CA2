@@ -49,15 +49,19 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Retrieves all posts for the authenticated user with pagination.
+        /// Retrieves all posts for the userId with pagination.
         /// </summary>
         [AuthorizeUser]
-        [HttpGet("user-posts")]
-        public async Task<IActionResult> GetPosts(int pageNumber = 1, int pageSize = 10)
+        [HttpGet("user-posts/{userId}")]
+        public async Task<IActionResult> GetPosts(int userId, int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                int userId = GetUserIdFromToken();
+                if (userId <= 0)
+                {
+                    _logger.LogWarning("Invalid userId in status request.");
+                    return BadRequest(new { Error = "Invalid userId." });
+                }
                 IEnumerable<PostDTO> posts = await _postService.GetPostsAsync(userId, pageNumber, pageSize);
                 return Ok(posts);
             }
@@ -100,6 +104,16 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
                 string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
@@ -127,6 +141,16 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
                 string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
@@ -198,7 +222,14 @@ namespace SOA_CA2.Controllers
 
             if (!allowedExtensions.Contains(fileExtension))
             {
-                throw new ArgumentException("Invalid file type.");
+                throw new ArgumentException("Invalid file type. Only .jpg, .jpeg, .png, and .gif are allowed.");
+            }
+
+            // Validate file size
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
+            if (file.Length > maxFileSize)
+            {
+                throw new ArgumentException("File size exceeds the maximum limit of 10MB.");
             }
 
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder);
