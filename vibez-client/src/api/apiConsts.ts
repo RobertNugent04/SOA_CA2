@@ -36,4 +36,10 @@ export const COMMENT_API = {
 
 };
 
+export const FRIEND_API = {
+
+    SEND_REQUEST: `${API_BASE_URL}/api/friendships/send-request`,
+
+};
+
 

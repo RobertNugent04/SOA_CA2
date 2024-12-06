@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getProfileRequest } from "../../api/Users/getProfile.ts";
+import { sendFriendRequest } from "../../api/Friends/sendFriendRequest.ts"; // Import the sendFriendRequest API
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
 import { EditUser } from "./EditUser.tsx";
@@ -46,8 +47,8 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
   const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [user_, setUser] = useState<UserProfileResponse | null>(null);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle EditUser component
+  const [isRequesting, setIsRequesting] = useState<boolean>(false); // State to handle request status
+  const [requestStatus, setRequestStatus] = useState<string | null>(null); // State for request feedback
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,55 +57,65 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
         const response = await getProfileRequest(token, userId);
         if (response.success) {
           setUserProfile(response.data!);
-          console.log("After setting user profile: ", userProfile);
         } else {
           setError(response.error || "Failed to fetch user data.");
         }
       } catch (err) {
         setError("An error occurred while fetching the profile.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchUser();
   }, [token, userId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  const handleSendFriendRequest = async () => {
+    if (isRequesting) return; // Prevent multiple requests
+    setIsRequesting(true);
+    setRequestStatus(null);
 
-  if (!userProfile) return <p>No user data available.</p>;
-
-  const { user, posts, friends } = userProfile;
-
-  console.log("User profile: ", userProfile.user.fullName);
-
-  const handleSave = (updatedData: { fullName: string; bio: string; profilePicture?: File | null }) => {
-    console.log("Saved Data:", updatedData);
-    setUser((prevUser) => ({
-      ...prevUser!,
-      fullName: updatedData.fullName,
-      bio: updatedData.bio,
-    }));
-    setIsEditing(false);
+    try {
+      const response = await sendFriendRequest({ friendId: userId }, token);
+      if (response.success) {
+        setRequestStatus("Friend request sent successfully!");
+      } else {
+        setRequestStatus("Failed to send friend request.");
+        console.error("Friend Request Error:", response.error);
+      }
+    } catch (error) {
+      setRequestStatus("An error occurred while sending the friend request.");
+      console.error("Error sending friend request:", error);
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!userProfile) return <p>No user data available.</p>;
+
+  const { user } = userProfile;
   const profilePictureUrl = user.profilePicturePath ? `${API_BASE_URL}${user.profilePicturePath}` : profilePic;
-  console.log("Profile Picture URL:", profilePictureUrl);
 
   return (
     <div className="user-card">
       <img src={profilePictureUrl} alt="profile" className="profile-picture" />
       <div className="current-user-info">
         <h2 className="username">{user.userName}</h2>
-        <p className="join-date">Joined {user.createdAt}</p>
+        <p className="join-date">Joined {new Date(user.createdAt).toLocaleDateString()}</p>
         <p className="bio">{user.bio || "No bio available."}</p>
       </div>
 
       <div className="user-actions">
-      <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
-        Send Friend Request
-      </button>
-
+        <button
+          className="edit-profile-button"
+          onClick={handleSendFriendRequest}
+          disabled={isRequesting}
+        >
+          {isRequesting ? "Sending..." : "Send Friend Request"}
+        </button>
+        {requestStatus && <p className="request-status">{requestStatus}</p>}
       </div>
     </div>
   );
