@@ -76,7 +76,7 @@ namespace SOA_CA2.Repositories
             try
             {
                 _logger.LogInformation("Fetching post by ID: {PostId}", postId);
-                return await _context.Posts.FindAsync(postId);
+                return await _context.Posts.Where(p => p.PostId == postId).Include(p => p.User).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
