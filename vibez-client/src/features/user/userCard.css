@@ -69,3 +69,94 @@
   .posts{
     margin-top: -60px;
   }
+
+.user-actions{
+  display:flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-top: 20px;
+}
+
+.user-actions button{
+  margin-bottom: 20px;
+}
+
+  /* Dark overlay */
+.edit-user-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+}
+
+/* Modal box */
+.edit-user-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Heading */
+.edit-user-box h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+/* Input fields */
+.edit-user-input,
+.edit-user-textarea {
+  width: 90%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.edit-user-textarea {
+  resize: none;
+  height: 80px;
+}
+
+/* File input */
+.edit-user-file-input {
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+/* Actions (Save & Cancel buttons) */
+.edit-user-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-user-save-button,
+.edit-user-cancel-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-user-save-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.edit-user-cancel-button {
+  background-color: #f44336;
+  color: white;
+}

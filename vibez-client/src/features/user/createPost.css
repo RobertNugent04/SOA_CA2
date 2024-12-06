@@ -1,0 +1,85 @@
+/* Dark overlay */
+.create-post-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Modal box */
+  .create-post-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  /* Heading */
+  .create-post-box h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+  }
+  
+  /* Input fields */
+  .create-post-textarea {
+    width: 90%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    resize: none;
+    height: 80px;
+  }
+  
+  /* File input */
+  .create-post-file-input {
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+  
+  /* Actions (Submit & Cancel buttons) */
+  .create-post-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .create-post-save-button,
+  .create-post-cancel-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .create-post-save-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .create-post-cancel-button {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  /* Selected file name */
+  .file-name {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  

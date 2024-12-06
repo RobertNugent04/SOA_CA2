@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful registration
 import { registerRequest } from "../../api/registerRequest.ts"; 
-import "./register.css";
 import logo from "../../assets/images/vibez_logo.jpg";
 import { Link } from "react-router-dom";
+import { resetPasswordRequest } from "../../api/resetPasswordRequest.ts";
 
-export const Register = () => {
+export const ForgotPassword = () => {
   // States for handling form input
-  const [fullName, setFullName] = useState("");
-  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); 
   const [errorMessage, setErrorMessage] = useState(""); 
 
@@ -23,19 +20,17 @@ export const Register = () => {
     setLoading(true); 
 
     const payload = {
-      fullName,
-      userName,
-      email,
-      password,
+        email
     };
 
     try {
-      const response = await registerRequest(payload); 
+      const response = await resetPasswordRequest(payload); 
 
       if (response) {
         // On successful registration, redirect to email verification page
         //store email in state
-        navigate("/email-verification", { state: { email } });
+        //navigate("/email-verification", { state: { email } });
+        navigate("/change-password", {state: {email}}); 
       }
     } catch (error) {
       setLoading(false);
@@ -49,30 +44,6 @@ export const Register = () => {
       <div className="login-form">
         <img src={logo} alt="Vibez Logo" className="login-logo" />
         <form onSubmit={handleSubmit}>
-          <div className="names">
-            <div className="form-group">
-              <label htmlFor="fullname" className="form-label">Full Name</label>
-              <input
-                id="fullname"
-                placeholder="Enter your full name"
-                className="input-field"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)} 
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="username" className="form-label">Username</label>
-              <input
-                id="username"
-                placeholder="Enter your username"
-                className="input-field"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)} 
-                required
-              />
-            </div>
-          </div>
           <div className="form-group">
             <label htmlFor="email" className="form-label">E-mail</label>
             <input
@@ -85,18 +56,6 @@ export const Register = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              className="input-field"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} 
-              required
-            />
-          </div>
 
           {/* Show error message if any */}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -104,17 +63,14 @@ export const Register = () => {
           {/* Show loading spinner when submitting */}
           {loading ? (
             <button type="button" className="login-button" disabled>
-              Registering...
+              Requesting...
             </button>
           ) : (
             <button type="submit" className="login-button">
-              Register
+              Request Password Change
             </button>
           )}
         </form>
-        <p className="signup-text">
-          Already have an account? <Link to="/" className="signup-link">Log In</Link>
-        </p>
       </div>
     </div>
   );

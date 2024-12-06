@@ -4,9 +4,16 @@ import './navbar.css';
 import logo from '../../assets/images/vibez_logo.jpg';
 import bell from '../../assets/images/notification_bell.png';
 import search from '../../assets/images/search_icon.png';
-import profilePic from '../../assets/images/default_pfp.png'; 
+import profilePic from '../../assets/images/default_pfp.png';
 
-export const Navbar = () => {
+type NavbarProps = {
+  currentUserId: number | null;
+  token: string | null; // Add token as a prop
+};
+
+export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
+
+  console.log("Navbar token: ", token);
 
   return (
     <nav className="navbar">
@@ -24,7 +31,10 @@ export const Navbar = () => {
           <input type="text" placeholder="Search" className="navbar-search-input" />
         </div>
         <div className="navbar-profile">
-        <Link to="/user">
+          <Link
+            to="/user"
+            state={{token, userId: currentUserId }} 
+          >
             <img src={profilePic} alt="Profile" className="navbar-profile-pic" />
           </Link>
         </div>
