@@ -58,14 +58,10 @@ namespace SOA_CA2.Services
             {
                 _logger.LogInformation("Fetching posts for user ID: {UserId}, Page: {Page}, Size: {Size}", userId, pageNumber, pageSize);
                 IEnumerable<Post> posts = await _unitOfWork.Posts.GetAllPostsAsync(userId, pageNumber, pageSize);
-                return posts.Select(post => new PostDTO
-                {
-                    PostId = post.PostId,
-                    UserId = post.UserId,
-                    Content = post.Content,
-                    ImageUrl = post.ImageUrl,
-                    CreatedAt = post.CreatedAt
-                });
+                IEnumerable<PostDTO> postDtos = posts.Select(post => _mapper.Map<PostDTO>(post));
+
+                _logger.LogInformation("Successfully fetched {Count} posts for user ID: {UserId}", postDtos.Count(), userId);
+                return postDtos;
             }
             catch (Exception ex)
             {
@@ -87,14 +83,8 @@ namespace SOA_CA2.Services
                     return null;
                 }
 
-                return new PostDTO
-                {
-                    PostId = post.PostId,
-                    UserId = post.UserId,
-                    Content = post.Content,
-                    ImageUrl = post.ImageUrl,
-                    CreatedAt = post.CreatedAt
-                };
+                PostDTO postDto = _mapper.Map<PostDTO>(post);
+                return postDto;
             }
             catch (Exception ex)
             {
