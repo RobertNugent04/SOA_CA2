@@ -1,4 +1,4 @@
-import API_BASE_URL from "./apiConsts.ts";
+import API_BASE_URL from "../apiConsts.ts";
 
 interface CreateCommentPayload {
   content: string;
