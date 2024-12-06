@@ -10,7 +10,7 @@ type Post = {
   createdAt: string;
 };
 
-export const findPostRequest = async (
+export const getPostRequest = async (
   postId: number,
   token: string
 ): Promise<{
