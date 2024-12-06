@@ -99,6 +99,13 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
         <p className="join-date">Joined {user.createdAt}</p>
         <p className="bio">{user.bio || "No bio available."}</p>
       </div>
+
+      <div className="user-actions">
+      <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
+        Send Friend Request
+      </button>
+
+      </div>
     </div>
   );
 };
