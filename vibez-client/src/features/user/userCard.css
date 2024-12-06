@@ -70,6 +70,17 @@
     margin-top: -60px;
   }
 
+.user-actions{
+  display:flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-top: 20px;
+}
+
+.user-actions button{
+  margin-bottom: 20px;
+}
+
   /* Dark overlay */
 .edit-user-overlay {
   position: fixed;

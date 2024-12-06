@@ -5,6 +5,7 @@ import profilePic from "../../assets/images/default_pfp.png";
 import { getUserProfileRequest } from "../../api/userProfileRequest.ts";
 import { EditUser } from "./EditUser.tsx";
 import API_BASE_URL from "../../api/apiConsts.ts";
+import { CreatePost } from "./CreatePost.tsx";
 
 type UserCardProps = {
   token: string;
@@ -27,6 +28,7 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false); 
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -87,6 +89,11 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
     setIsEditing(false);
   };
 
+  const handlePostCreated = (newPost: { content: string; imageUrl: string }) => {
+    console.log("New Post Created:", newPost);
+    setIsCreatingPost(false);
+  };
+
   const profilePictureUrl = user.profilePicturePath ? `${API_BASE_URL}${user.profilePicturePath}` : profilePic;
   console.log("Profile Picture URL:", profilePictureUrl);
 
@@ -98,6 +105,8 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
         <p className="join-date">Joined {user.createdAt}</p>
         <p className="bio">{user.bio || "No bio available."}</p>
       </div>
+
+      <div className="user-actions">
       <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
         Edit Profile
       </button>
@@ -110,6 +119,22 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
           onClose={() => setIsEditing(false)} 
           token={token}/>
       )}
+
+<button
+  className="edit-profile-button"
+  onClick={() => setIsCreatingPost(true)}
+>
+  Create Post
+</button>
+
+{isCreatingPost && (
+    <CreatePost
+      token={token}
+      onClose={() => setIsCreatingPost(false)}
+      onPostCreated={handlePostCreated}
+    />
+  )}
+</div>
     </div>
   );
 };
