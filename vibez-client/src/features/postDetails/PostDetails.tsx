@@ -7,7 +7,7 @@ import { Posts } from '../posts/Posts.tsx';
 import black_like from '../../assets/images/black_like.png';
 import blue_like from '../../assets/images/blue_like.png';
 
-export const PostDetails = ({ postId, posts }) => {
+export const PostDetails = ({ postId }) => {
   const [goBack, setGoBack] = useState(false);
   const [likes, setLikes] = useState({});
   const [likeImages, setLikeImages] = useState({});
@@ -45,6 +45,7 @@ export const PostDetails = ({ postId, posts }) => {
     },
   ];
 
+  console.log('postId:', postId);
   const post = posts.find((p) => p.id === postId);
   const filteredComments = comments.filter((comment) => comment.postId === postId);
 

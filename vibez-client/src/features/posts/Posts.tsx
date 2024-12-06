@@ -99,7 +99,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   if (!posts.length) return <p>No posts available.</p>;
 
   if (selectedPostId !== null) {
-    return <PostDetails postId={selectedPostId} posts={posts} />;
+    return <PostDetails postId={selectedPostId} />;
   }
 
   const { user, friends } = userProfile || { user: {}, friends: [] };

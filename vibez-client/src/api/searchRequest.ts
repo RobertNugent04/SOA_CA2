@@ -1,8 +1,8 @@
-import { AUTH_API } from './apiConsts.ts';
+import { USER_API } from './apiConsts.ts';
 
 export const searchUserRequest = async (userName: string) => {
   try {
-    const response = await fetch(AUTH_API.SEARCH, {
+    const response = await fetch(USER_API.SEARCH, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
