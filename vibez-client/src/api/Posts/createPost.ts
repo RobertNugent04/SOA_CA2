@@ -1,4 +1,4 @@
-import { POST_API } from './apiConsts.ts';
+import { POST_API } from '../apiConsts.ts';
 
 interface CreatePostPayload {
   content: string;

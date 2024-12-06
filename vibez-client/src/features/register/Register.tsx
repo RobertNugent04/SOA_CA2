@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful registration
-import { registerRequest } from "../../api/registerRequest.ts"; 
+import { registerRequest } from "../../api/Users/registerRequest.ts"; 
 import "./register.css";
 import logo from "../../assets/images/vibez_logo.jpg";
 import { Link } from "react-router-dom";

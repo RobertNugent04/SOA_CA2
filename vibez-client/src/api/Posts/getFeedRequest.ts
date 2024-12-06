@@ -1,4 +1,4 @@
-import { POST_API } from "./apiConsts.ts";
+import { POST_API } from "../apiConsts.ts";
 
 type Post = {
   postId: number;
@@ -10,16 +10,15 @@ type Post = {
   createdAt: string;
 };
 
-export const getPostRequest = async (
-  postId: number,
+export const getFeedRequest = async (
   token: string
 ): Promise<{
   success: boolean;
-  data?: Post;
+  data?: Post[];
   error?: string;
 }> => {
   try {
-    const response = await fetch(POST_API.GET_POST(postId), {
+    const response = await fetch(POST_API.GET_FEED, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -30,8 +29,8 @@ export const getPostRequest = async (
     console.log("Response:", response);
 
     if (response.ok) {
-      const data: Post = await response.json();
-      console.log("Post fetched successfully:", data);
+      const data: Post[] = await response.json();
+      console.log("Feed fetched successfully:", data);
       return { success: true, data };
     } else {
       const errorData = await response.json();

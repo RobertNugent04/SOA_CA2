@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Posts } from './features/posts/Posts.tsx';
 import { Navbar } from './features/navbar/Navbar.tsx';
 import { MessageTab } from './features/messageTab/MessageTab.tsx';
-import { getUserProfileRequest } from './api/userProfileRequest.ts'; // Assuming the getProfile API request is defined here
+import { getUserProfileRequest } from './api/Users/userProfileRequest.ts'; // Assuming the getProfile API request is defined here
 import { useLocation } from 'react-router-dom';
 
 export const HomeRoute: React.FC = () => {

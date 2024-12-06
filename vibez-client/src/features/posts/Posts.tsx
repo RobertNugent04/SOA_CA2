@@ -6,8 +6,8 @@ import blue_like from "../../assets/images/blue_like.png";
 import send from "../../assets/images/send.png";
 import API_BASE_URL from "../../api/apiConsts.ts";
 import { PostDetails } from "../postDetails/PostDetails.tsx";
-import { getProfileRequest } from "../../api/getProfile.ts";
-import { getFeedRequest } from "../../api/getFeedRequest.ts";
+import { getProfileRequest } from "../../api/Users/getProfile.ts";
+import { getFeedRequest } from "../../api/Posts/getFeedRequest.ts";
 import profilePic from "../../assets/images/default_pfp.png";
 
 type UserProfile = {

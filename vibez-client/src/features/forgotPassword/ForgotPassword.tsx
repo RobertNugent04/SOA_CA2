@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // For redirecting after success
 import { registerRequest } from "../../api/registerRequest.ts"; 
 import logo from "../../assets/images/vibez_logo.jpg";
 import { Link } from "react-router-dom";
-import { resetPasswordRequest } from "../../api/resetPasswordRequest.ts";
+import { resetPasswordRequest } from "../../api/Users/resetPasswordRequest.ts";
 
 export const ForgotPassword = () => {
   // States for handling form input

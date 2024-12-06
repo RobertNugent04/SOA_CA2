@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './userCard.css';
-import { updateProfileRequest } from '../../api/updateProfileRequest.ts';
+import { updateProfileRequest } from '../../api/Users/updateProfileRequest.ts';
 
 type EditUserProps = {
   fullName: string;

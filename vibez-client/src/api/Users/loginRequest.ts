@@ -1,4 +1,4 @@
-import { AUTH_API } from './apiConsts.ts';
+import { AUTH_API } from '../apiConsts.ts';
 
 interface LoginPayload {
   userNameOrEmail: string;

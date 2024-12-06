@@ -1,4 +1,4 @@
-import { USER_API } from './apiConsts.ts';
+import { USER_API } from '../apiConsts.ts';
 
 interface UpdateProfilePayload {
   fullName: string;

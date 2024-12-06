@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getProfileRequest } from "../../api/getProfile.ts";
+import { getProfileRequest } from "../../api/Users/getProfile.ts";
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
 import { EditUser } from "./EditUser.tsx";

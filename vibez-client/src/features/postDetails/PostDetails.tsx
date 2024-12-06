@@ -6,7 +6,7 @@ import send from "../../assets/images/send.png";
 import { Posts } from "../posts/Posts.tsx";
 import black_like from "../../assets/images/black_like.png";
 import blue_like from "../../assets/images/blue_like.png";
-import { getPostRequest } from "../../api/getPostRequest.ts";
+import { getPostRequest } from "../../api/Posts/getPostRequest.ts";
 import { createCommentRequest } from "../../api/Comments/createCommentRequest.ts"; // Import the createCommentRequest
 import API_BASE_URL from "../../api/apiConsts.ts";
 
