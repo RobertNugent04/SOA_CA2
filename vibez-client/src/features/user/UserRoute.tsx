@@ -20,7 +20,7 @@ export const UserRoute: React.FC = () => {
       <Navbar token={token} currentUserId={userId} /> {/* Pass userId to Navbar */}
       <div className="content-wrapper">
         <div className="posts-container">
-          <UserCard token={token} userId={userId} /> {/* Pass userId to UserCard */}
+          <UserCard token={token} userId={userId.toString()} /> {/* Pass userId to UserCard */}
           <div className="posts">
             <Posts isUserPage={true} userId={userId.toString()} token={token} /> {/* Use dynamic userId */}
           </div>

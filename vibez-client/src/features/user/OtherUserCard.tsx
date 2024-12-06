@@ -99,18 +99,6 @@ export const UserCard: React.FC<UserCardProps> = ({ token, userId }) => {
         <p className="join-date">Joined {user.createdAt}</p>
         <p className="bio">{user.bio || "No bio available."}</p>
       </div>
-      <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
-        Edit Profile
-      </button>
-
-      {isEditing && (
-  <EditUser
-          fullName={user.fullName}
-          bio={user.bio}
-          onSave={handleSave}
-          onClose={() => setIsEditing(false)} 
-          token={token}/>
-      )}
     </div>
   );
 };

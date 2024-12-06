@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./posts.css";
 import black_like from "../../assets/images/black_like.png";
 import blue_like from "../../assets/images/blue_like.png";
@@ -59,6 +60,8 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate(); // For navigation to the user profile
+
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
@@ -66,7 +69,6 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
         let response;
 
         if (isUserPage) {
-          // Fetch the user's profile and posts
           response = await getProfileRequest(token, userId);
           if (response.success) {
             const profileData = response.data!;
@@ -76,10 +78,9 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
             setError(response.error || "Failed to fetch user posts.");
           }
         } else {
-          // Fetch the activity feed for a public feed
           response = await getFeedRequest(token);
           if (response.success) {
-            setPosts(response.data || []); 
+            setPosts(response.data || []);
           } else {
             setError(response.error || "Failed to fetch activity feed.");
           }
@@ -99,23 +100,30 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   if (!posts.length) return <p>No posts available.</p>;
 
   if (selectedPostId !== null) {
-    return <PostDetails postId={selectedPostId} token={token}/>;
+    return <PostDetails postId={selectedPostId} token={token} />;
   }
 
   const { user, friends } = userProfile || { user: {}, friends: [] };
 
-  const profilePictureUrl = user.profilePicturePath ? `${API_BASE_URL}${user.profilePicturePath}` : profilePic;
-  console.log("Profile Picture URL:", profilePictureUrl);
+  const profilePictureUrl = user.profilePicturePath
+    ? `${API_BASE_URL}${user.profilePicturePath}`
+    : profilePic;
 
   const getPostImageUrl = (imageUrl: string | null) =>
     imageUrl ? `${API_BASE_URL}${imageUrl}` : undefined;
 
+  const otherUserId = userId;
+
+  const handleProfileClick = (userId: number) => {
+    // Navigate to the UserRoute for the clicked user
+    const otherUserId = userId;
+    navigate(`/other-user`, { state: { userId, token, otherUserId} });
+  };
 
   return (
     <div className="posts-container">
       <h2 className="posts-header">{isUserPage ? "User Posts" : "Posts"}</h2>
       {posts.map((post) => (
-        
         <div
           key={post.postId}
           className="post-item"
@@ -127,6 +135,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
                 src={getPostImageUrl(post.profilePicturePath) || ""}
                 alt={`Post by user ${post.userId}`}
                 className="post-profile-pic"
+                onClick={() => handleProfileClick(post.userId)} 
               />
               <div className="post-author-date">
                 <span className="post-author">{post.userName}</span>
