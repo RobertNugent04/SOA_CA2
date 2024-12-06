@@ -1,4 +1,4 @@
-import API_BASE_URL from "../apiConsts.ts";
+import { COMMENT_API } from '../apiConsts.ts';
 
 interface CreateCommentPayload {
   content: string;
@@ -10,7 +10,7 @@ export const createCommentRequest = async (
   token: string
 ) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/comments`, {
+    const response = await fetch(`${COMMENT_API.CREATE_COMMENT}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

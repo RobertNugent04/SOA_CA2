@@ -32,6 +32,7 @@ export const POST_API = {
 export const COMMENT_API = {
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comments`,
+    GET_COMMENTS: (postId: number) => `${API_BASE_URL}/api/comments/post/${postId}`,
 
 };
 
