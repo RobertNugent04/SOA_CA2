@@ -7,7 +7,8 @@ import { Posts } from "../posts/Posts.tsx";
 import black_like from "../../assets/images/black_like.png";
 import blue_like from "../../assets/images/blue_like.png";
 import { getPostRequest } from "../../api/Posts/getPostRequest.ts";
-import { createCommentRequest } from "../../api/Comments/createCommentRequest.ts"; // Import the createCommentRequest
+import { createCommentRequest } from "../../api/Comments/createCommentRequest.ts";
+import { getCommentsRequest } from "../../api/Comments/getCommentsRequest.ts"; // Import API to fetch comments
 import API_BASE_URL from "../../api/apiConsts.ts";
 
 export const PostDetails = ({ postId, token }) => {
@@ -17,9 +18,10 @@ export const PostDetails = ({ postId, token }) => {
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [commentText, setCommentText] = useState<string>(""); // State for the new comment input
-  const [comments, setComments] = useState<any[]>([]); // State to store all comments for the post
+  const [commentText, setCommentText] = useState<string>("");
+  const [comments, setComments] = useState<any[]>([]);
 
+  // Fetch post details
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
@@ -40,6 +42,25 @@ export const PostDetails = ({ postId, token }) => {
     fetchPost();
   }, [postId, token]);
 
+  // Fetch comments for the current post
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await getCommentsRequest(postId, token);
+        if (response.success) {
+          setComments(response.data); // Populate comments from API
+        } else {
+          console.error('Failed to fetch comments:', response.error);
+        }
+      } catch (err) {
+        console.error('An error occurred while fetching comments:', err);
+      }
+    };
+  
+    fetchComments();
+  }, [postId, token]);
+  
+
   const handleLike = (postId: number) => {
     setLikes((prevLikes) => ({
       ...prevLikes,
@@ -55,21 +76,22 @@ export const PostDetails = ({ postId, token }) => {
   };
 
   const handleCommentSubmit = async () => {
-    if (!commentText.trim()) return; // Prevent empty comments
+    if (!commentText.trim()) return;
 
     const payload = { content: commentText, postId };
     const response = await createCommentRequest(payload, token);
 
     if (response.success) {
-      // Update comments locally without refetching
+      // Append the new comment to the comments array
       setComments((prevComments) => [
         ...prevComments,
         {
-          id: Date.now(), // Temporary ID
+          commentId: response.data?.id || Date.now(), // Use server ID if available
           postId,
-          user: { name: "You", profilePic: "https://via.placeholder.com/40" },
           content: commentText,
-          date: new Date().toLocaleDateString(),
+          createdAt: new Date().toISOString(),
+          userId: 0, // Placeholder for userId
+          user: { name: "You", profilePic: "https://via.placeholder.com/40" },
         },
       ]);
       setCommentText(""); // Clear the input field
@@ -134,24 +156,24 @@ export const PostDetails = ({ postId, token }) => {
 
       <div className="comments-container">
         <h3 className="comments-header">Comments</h3>
-        {comments
-          .filter((comment) => comment.postId === postId)
-          .map((comment) => (
-            <div key={comment.id} className="comment-item">
-              <img
-                src={comment.user.profilePic}
-                alt={comment.user.name}
-                className="comment-profile-pic"
-              />
-              <div className="comment-content-wrapper">
-                <div className="comment-author-date">
-                  <span className="comment-author">{comment.user.name}</span>
-                  <span className="comment-date">{comment.date}</span>
-                </div>
-                <div className="comment-content">{comment.content}</div>
+        {comments.map((comment) => (
+          <div key={comment.commentId} className="comment-item">
+            <img
+              src={comment.user?.profilePic || "https://via.placeholder.com/40"}
+              alt={comment.user?.name || "User"}
+              className="comment-profile-pic"
+            />
+            <div className="comment-content-wrapper">
+              <div className="comment-author-date">
+                <span className="comment-author">{comment.user?.name || "Anonymous"}</span>
+                <span className="comment-date">
+                  {new Date(comment.createdAt).toLocaleDateString()}
+                </span>
               </div>
+              <div className="comment-content">{comment.content}</div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );
