@@ -6,7 +6,9 @@ import bell from '../../assets/images/notification_bell.png';
 import searchIcon from '../../assets/images/search_icon.png';
 import defaultProfilePic from '../../assets/images/default_pfp.png';
 import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts';
-import { searchRequest } from '../../api/Users/searchRequest.ts'; 
+import { searchRequest } from '../../api/Users/searchRequest.ts';
+import { getUserProfileRequest } from '../../api/Users/userProfileRequest.ts'; // Import API request
+import API_BASE_URL from '../../api/apiConsts.ts';
 
 type NavbarProps = {
   currentUserId: number | null;
@@ -20,8 +22,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
 
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -42,11 +45,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
     }
   };
 
-  // Toggle notifications dropdown
-  const toggleNotifications = () => {
-    setShowNotifications((prev) => !prev);
-    if (!notifications.length) fetchNotifications(); // Fetch only if not already fetched
-  };
+  // Fetch user profile picture
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (token) {
+        const response = await getUserProfileRequest(token);
+        if (response.success && response.data?.profilePicturePath) {
+          setProfilePic(response.data.profilePicturePath);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [token]);
 
   // Handle search input changes
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
     }
 
     try {
-      const results = await searchRequest(query); // Call search API
+      const results = await searchRequest(query);
       setSearchResults(results);
       setShowSearchDropdown(true);
     } catch (err) {
@@ -72,33 +83,31 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
   // Navigate to user's profile when a search result is clicked
   const handleResultClick = (otherUserId: number) => {
     navigate('/other-user', {
-      state: { userId: currentUserId, token, otherUserId }, // Pass required state
+      state: { userId: currentUserId, token, otherUserId },
     });
 
-    setShowSearchDropdown(false); // Close dropdown after navigation
-    setSearchQuery(''); // Clear the search bar
+    setShowSearchDropdown(false);
+    setSearchQuery('');
   };
 
-  // Close search dropdown on click outside (optional enhancement)
-  useEffect(() => {
-    const closeDropdown = () => setShowSearchDropdown(false);
-    window.addEventListener('click', closeDropdown);
-    return () => window.removeEventListener('click', closeDropdown);
-  }, []);
+  // Toggle notifications dropdown visibility
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const getImageUrl = (imageUrl: string | null) =>
+    imageUrl ? `${API_BASE_URL}${imageUrl}` : undefined;
 
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <Link to="/home">
+        <Link to="/home" state={{ token, userId: currentUserId }}>
           <img src={logo} alt="Vibez Logo" className="navbar-logo" />
         </Link>
       </div>
       <div className="navbar-right">
         {/* Notifications Icon */}
-        <div className="navbar-icon" onClick={(e) => {
-          e.stopPropagation(); // Prevent closing dropdown due to window click
-          toggleNotifications();
-        }}>
+        <div className="navbar-icon" onClick={toggleNotifications}>
           <img src={bell} alt="notification bell" className="bell" />
           {showNotifications && (
             <div className="notifications-dropdown">
@@ -130,7 +139,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
             className="navbar-search-input"
             value={searchQuery}
             onChange={handleSearchChange}
-            onClick={(e) => e.stopPropagation()} // Prevent closing dropdown
           />
           {showSearchDropdown && (
             <div className="search-dropdown">
@@ -140,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
                     <div
                       key={result.id}
                       className="search-item"
-                      onClick={() => handleResultClick(result.userId)} // Navigate to the user's profile
+                      onClick={() => handleResultClick(result.userId)}
                     >
                       <img
                         src={result.profilePic || defaultProfilePic}
@@ -164,7 +172,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
             to="/user"
             state={{ token, userId: currentUserId }}
           >
-            <img src={defaultProfilePic} alt="Profile" className="navbar-profile-pic" />
+            <img
+              src={getImageUrl(profilePic) || defaultProfilePic}
+              alt="Profile"
+              className="navbar-profile-pic"
+            />
           </Link>
         </div>
       </div>
