@@ -7,9 +7,12 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
  */
 export const createNotificationHubConnection = (token: string) => {
   const connection = new HubConnectionBuilder()
-    .withUrl(`https://localhost:7198/notificationHub`, {
-      accessTokenFactory: () => token, // Use token for authentication
-    })
+    .withUrl(
+      `https://vibez-web-service-g8gzbmfvdnc2hahw.northeurope-01.azurewebsites.net/notificationHub`,
+      {
+        accessTokenFactory: () => token, // Use token for authentication
+      }
+    )
     .configureLogging(LogLevel.Information) // Optional: Set logging level
     .withAutomaticReconnect() // Automatically reconnect on disconnection
     .build();

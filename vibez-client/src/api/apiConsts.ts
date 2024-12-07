@@ -1,4 +1,6 @@
-const API_BASE_URL = "https://localhost:7198";
+// const API_BASE_URL = "https://localhost:7198";
+const API_BASE_URL =
+  "https://vibez-web-service-g8gzbmfvdnc2hahw.northeurope-01.azurewebsites.net";
 
 export default API_BASE_URL;
 

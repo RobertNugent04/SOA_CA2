@@ -1,55 +1,43 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SOA_CA2.Models.DTOs.Call;
 using System.Threading.Tasks;
 
 namespace SOA_CA2.SignalR
 {
     /// <summary>
-    /// SignalR hub for managing real-time call signaling.
+    /// SignalR hub for managing real-time call signaling for WebRTC.
     /// </summary>
     public class CallHub : Hub
     {
         /// <summary>
-        /// Initiates a call to a user.
+        /// Sends an offer to the receiver.
         /// </summary>
-        public async Task InitiateCall(int receiverId, CallDto call)
+        public async Task SendOffer(string receiverId, object offer)
         {
-            // Notify the receiver about the incoming call
-            await Clients.User(receiverId.ToString()).SendAsync("ReceiveCall", call);
+            await Clients.User(receiverId).SendAsync("ReceiveOffer", offer);
         }
 
         /// <summary>
-        /// Sends WebRTC offer or possibly also  answer to the remote peer.
+        /// Sends an answer back to the caller.
         /// </summary>
-        public async Task SendSignal(int userId, object signalData)
+        public async Task SendAnswer(string callerId, object answer)
         {
-            // Forward the signal data to the specified user
-            await Clients.User(userId.ToString()).SendAsync("ReceiveSignal", signalData);
+            await Clients.User(callerId).SendAsync("ReceiveAnswer", answer);
         }
 
         /// <summary>
-        /// Ends the call.
+        /// Sends an ICE candidate to the specified user.
         /// </summary>
-        public async Task EndCall(int callId)
+        public async Task SendIceCandidate(string userId, object candidate)
         {
-            // Notify that the call has ended
-            await Clients.Group(callId.ToString()).SendAsync("CallEnded");
+            await Clients.User(userId).SendAsync("ReceiveIceCandidate", candidate);
         }
 
         /// <summary>
-        /// Joins the call for signaling.
+        /// Ends the call for the specified user.
         /// </summary>
-        public async Task JoinCall(int callId)
+        public async Task EndCall(string userId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, callId.ToString());
-        }
-
-        /// <summary>
-        /// Leaves the call.
-        /// </summary>
-        public async Task LeaveCall(int callId)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, callId.ToString());
+            await Clients.User(userId).SendAsync("CallEnded");
         }
     }
 }
