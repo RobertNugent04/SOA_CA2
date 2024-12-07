@@ -57,7 +57,9 @@ builder.Services.AddAuthentication(options =>
             var path = context.HttpContext.Request.Path;
 
             // Check if the request is for SignalR
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+            if ((!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub")) ||
+                (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/messageHub")) ||
+                (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/callHub")))
             {
                 context.Token = accessToken;
             }
