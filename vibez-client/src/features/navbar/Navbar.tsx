@@ -7,7 +7,8 @@ import searchIcon from '../../assets/images/search_icon.png';
 import defaultProfilePic from '../../assets/images/default_pfp.png';
 import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts';
 import { searchRequest } from '../../api/Users/searchRequest.ts';
-import { getUserProfileRequest } from '../../api/Users/userProfileRequest.ts'; // Import API request
+import { getUserProfileRequest } from '../../api/Users/userProfileRequest.ts'; 
+import { acceptFriendshipRequest } from '../../api/Friends/acceptFriendRequest.ts'; 
 import API_BASE_URL from '../../api/apiConsts.ts';
 
 type NavbarProps = {
@@ -22,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
+  const [profilePic, setProfilePic] = useState<string | null>(null); 
 
   const navigate = useNavigate();
 
@@ -35,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
 
     try {
       const response = await getNotificationsRequest(token);
-      
+
       if (response.success) {
         console.log('Notifications:', response.data);
         setNotifications(response.data);
@@ -46,6 +47,34 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       setError('An error occurred while fetching notifications.');
     }
   };
+
+  const handleAcceptFriendRequest = async (friendId: number | undefined) => {
+    if (!friendId) {
+      console.error("Friend ID is undefined.");
+      alert("Error: Invalid friend request.");
+      return;
+    }
+  
+    if (!token) {
+      setError("No token provided");
+      return;
+    }
+  
+    try {
+      const response = await acceptFriendshipRequest(token, friendId);
+  
+      if (response.success) {
+        setNotifications((prev) =>
+          prev.filter((notif) => notif.friendId !== friendId)
+        );
+      } else {
+        console.error("Failed to accept friend request:", response.error);
+      }
+    } catch (err) {
+      console.error("Error accepting friend request:", err);
+    }
+  };
+  
 
   // Fetch user profile picture
   useEffect(() => {
@@ -110,10 +139,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       </div>
       <div className="navbar-right">
         {/* Notifications Icon */}
-        <div className="navbar-icon" onClick={(e) => {
-          e.stopPropagation(); // Prevent closing dropdown due to window click
-          toggleNotifications();
-        }}>
+        <div
+          className="navbar-icon"
+          onClick={(e) => {
+            toggleNotifications();
+          }}
+        >
           <img src={bell} alt="notification bell" className="bell" />
           {showNotifications && (
             <div className="notifications-dropdown">
@@ -126,6 +157,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
                       <span className="notification-date">
                         {new Date(notification.createdAt).toLocaleString()}
                       </span>
+                      {/* Add button to accept friend request if notification type is FriendRequest */}         
+                      {notification.type === 'FriendRequest' && (
+                        <button
+                          className="accept-friend-button"
+                          onClick={() => handleAcceptFriendRequest(notification.senderId)}
+                        >
+                          Accept
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -174,10 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
 
         {/* Profile Picture */}
         <div className="navbar-profile">
-          <Link
-            to="/user"
-            state={{ token, userId: currentUserId }}
-          >
+          <Link to="/user" state={{ token, userId: currentUserId }}>
             <img
               src={getImageUrl(profilePic) || defaultProfilePic}
               alt="Profile"

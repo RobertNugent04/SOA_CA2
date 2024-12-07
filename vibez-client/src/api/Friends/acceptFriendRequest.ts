@@ -1,18 +1,19 @@
 import { FRIEND_API } from '../apiConsts.ts'; 
 
-// Function to accept a friendship request
 export const acceptFriendshipRequest = async (
   token: string,
   friendId: number
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    const response = await fetch(`${FRIEND_API.ACCEPT_REQUEST}/${friendId}`, {
+    const response = await fetch(FRIEND_API.ACCEPT_REQUEST(friendId), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
+
+    console.log('Friendship request: ', token, friendId);
 
     if (response.ok) {
       return { success: true };
