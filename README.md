@@ -92,11 +92,18 @@ We prioritized clean, maintainable, and scalable code throughout the project. He
 
 ---
 
+## Authorization
+
+When registering or changing your password you must recieve and enter a **one time passcorde** for email verification purposes.
+
+After logging in with email and password, you will be allocated a **JWT token** which is needed to make use of any of the APIs. This ensures the APIs are not used by any unauthorized users.
+
+---
+
 ## Testing
 
 We developed **32 unit tests** using **xUnit** to ensure our system’s reliability. These tests covered services, repositories, and controllers. Additionally, we tested the APIs thoroughly using **Postman** to validate their functionality under various scenarios.
 
----
 
 ## Screenshots
 
