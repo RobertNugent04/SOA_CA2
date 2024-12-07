@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import './messageTab.css';
-import { Messages } from '../messages/Messages.tsx';
-import { getProfileRequest } from '../../api/Users/getProfile.ts'; // Adjust the path as necessary
-import { getConversation } from '../../api/Messages/getConversationRequest.ts'; // API call to get conversation
-import defaultProfilePic from '../../assets/images/default_pfp.png';
-import API_BASE_URL from '../../api/apiConsts.ts';
+import React, { useState, useEffect } from "react";
+import "./messageTab.css";
+import { Messages } from "../messages/Messages.tsx";
+import { getProfileRequest } from "../../api/Users/getProfile.ts"; // Adjust the path as necessary
+import defaultProfilePic from "../../assets/images/default_pfp.png";
+import API_BASE_URL from "../../api/apiConsts.ts";
 
 type MessageTabProps = {
   currentUserId: number;
   token: string;
 };
 
-export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) => {
-  const [friends, setFriends] = useState<any[]>([]); 
+export const MessageTab: React.FC<MessageTabProps> = ({
+  currentUserId,
+  token,
+}) => {
+  const [friends, setFriends] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch user's friends using the API
@@ -23,31 +25,22 @@ export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) 
       setLoading(true);
       setError(null);
 
+      console.log("Fetching friends for user:", currentUserId);
+
       try {
+        // Fetch user's profile
         const response = await getProfileRequest(token, currentUserId);
+        console.log("Profile Response:", response);
+
         if (response.success && response.data?.friends) {
-          // Fetch the latest message for each friend
-          const friendsWithLatestMessages = await Promise.all(
-            response.data.friends.map(async (friend: any) => {
-              const conversationResponse = await getConversation(token, friend.userId);
-              //Make sure the conversation has valid messages
-              const latestMessage = conversationResponse.success && conversationResponse.data && conversationResponse.data.length > 0
-                ? conversationResponse.data[conversationResponse.data.length - 1]
-                : null;
-               // Return the friend object with the latest message
-              return {
-                ...friend,
-                latestMessage,
-              };
-            })
-          );
-          setFriends(friendsWithLatestMessages);
+          setFriends(response.data.friends);
         } else {
-          setError(response.error || 'Failed to fetch friends.');
+          console.error("Error in profile response:", response);
+          setError(response.error || "Failed to fetch friends.");
         }
       } catch (err) {
-        console.error('Error fetching friends:', err);
-        setError('An error occurred while fetching friends.');
+        console.error("Error fetching friends:", err);
+        setError("An error occurred while fetching friends.");
       } finally {
         setLoading(false);
       }
@@ -81,14 +74,16 @@ export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) 
             >
               <div className="message-profile-pic">
                 <img
-                  src={getImageUrl(friend.profilePicturePath)} 
-                  alt={friend.fullName || 'Friend'}
+                  src={getImageUrl(friend.profilePicturePath)}
+                  alt={friend.fullName || "Friend"}
                 />
               </div>
               <div className="message-content-wrapper">
-                <div className="message-sender">{friend.userName || 'Unknown Friend'}</div>
+                <div className="message-sender">
+                  {friend.userName || "Unknown Friend"}
+                </div>
                 <div className="message-content">
-                  {friend.latestMessage ? friend.latestMessage.content : 'Start a conversation!'}
+                  Start a conversation! {/* Placeholder text */}
                 </div>
               </div>
             </div>
@@ -96,11 +91,11 @@ export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) 
         </div>
       ) : (
         // Render the Messages component for the selected user
-        <Messages 
-          currentUserId={currentUserId} 
-          otherUserId={selectedUserId} 
-          token={token} 
-          users={friends}  
+        <Messages
+          currentUserId={currentUserId}
+          otherUserId={selectedUserId}
+          token={token}
+          users={friends}
         />
       )}
     </div>

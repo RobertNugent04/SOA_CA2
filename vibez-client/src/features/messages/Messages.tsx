@@ -126,6 +126,7 @@ export const Messages = ({
         )}
       </div>
       <div className="messages-list">
+      <div ref={messagesEndRef} />
         {loading ? (
           <p>Loading messages...</p>
         ) : error ? (
@@ -145,7 +146,6 @@ export const Messages = ({
             </div>
           ))
         )}
-        <div ref={messagesEndRef} />
       </div>
       <div className="message-input-container">
         <input
