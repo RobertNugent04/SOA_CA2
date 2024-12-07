@@ -42,4 +42,10 @@ export const FRIEND_API = {
 
 };
 
+export const LIKE_API = {
+
+    SEND_LIKE: `${API_BASE_URL}/api/likes`,
+
+};
+
 
