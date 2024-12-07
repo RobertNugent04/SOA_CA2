@@ -48,4 +48,10 @@ export const LIKE_API = {
 
 };
 
+export const NOTIFICATION_API = {
+
+    GET_NOTIFICATIONS: `${API_BASE_URL}/api/notifications`,
+
+};
+
 

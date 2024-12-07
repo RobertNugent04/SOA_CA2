@@ -1,9 +1,9 @@
-import { USER_API } from './apiConsts.ts';
+import { USER_API } from '../apiConsts.ts';
 
 export const searchUserRequest = async (userName: string) => {
   try {
     const response = await fetch(USER_API.SEARCH, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
