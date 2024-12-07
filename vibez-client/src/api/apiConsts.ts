@@ -29,4 +29,37 @@ export const POST_API = {
 
 };
 
+export const COMMENT_API = {
+
+    CREATE_COMMENT: `${API_BASE_URL}/api/comments`,
+    GET_COMMENTS: (postId: number) => `${API_BASE_URL}/api/comments/post/${postId}`,
+
+};
+
+export const FRIEND_API = {
+
+    SEND_REQUEST: `${API_BASE_URL}/api/friendships/send-request`,
+    ACCEPT_REQUEST: (friendId: number) => `${API_BASE_URL}/api/friendships/accept/${friendId}`,
+
+};
+
+export const LIKE_API = {
+
+    SEND_LIKE: `${API_BASE_URL}/api/likes`,
+
+};
+
+export const NOTIFICATION_API = {
+
+    GET_NOTIFICATIONS: `${API_BASE_URL}/api/notifications`,
+
+};
+
+export const MESSAGE_API = {
+
+    GET_CONVERSATION: (friendId: number) => `${API_BASE_URL}/api/messages/conversation/${friendId}`,
+    SEND_MESSAGE: `${API_BASE_URL}/api/messages`,
+
+};
+
 

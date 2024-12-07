@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./userCard.css";
 import profilePic from "../../assets/images/default_pfp.png";
-import { getUserProfileRequest } from "../../api/userProfileRequest.ts";
+import { getUserProfileRequest } from "../../api/Users/userProfileRequest.ts";
 import { EditUser } from "./EditUser.tsx";
 import API_BASE_URL from "../../api/apiConsts.ts";
 import { CreatePost } from "./CreatePost.tsx";

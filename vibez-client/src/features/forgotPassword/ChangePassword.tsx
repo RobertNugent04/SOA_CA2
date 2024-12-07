@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom"; // For redirecting 
 import { registerRequest } from "../../api/registerRequest.ts"; 
 import logo from "../../assets/images/vibez_logo.jpg";
 import { Link } from "react-router-dom";
-import { changePassword } from "../../api/resetPasswordRequest.ts";
+import { changePassword } from "../../api/Users/resetPasswordRequest.ts";
 import "./changePassword.css";
 
 export const ChangePassword = (payload: { email: string; otp: string; password: string; }) => {

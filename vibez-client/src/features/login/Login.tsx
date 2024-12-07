@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./login.css";
 import logo from "../../assets/images/vibez_logo.jpg";
 import { Link, useNavigate } from "react-router-dom";
-import { loginRequest } from "../../api/loginRequest.ts";
+import { loginRequest } from "../../api/Users/loginRequest.ts";
 
 export const Login = () => {
   const [userNameOrEmail, setEmail] = useState("");

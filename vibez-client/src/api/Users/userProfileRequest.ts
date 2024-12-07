@@ -1,4 +1,4 @@
-import { USER_API } from './apiConsts.ts';
+import { USER_API } from '../apiConsts.ts';
 
 // Function to fetch a user's profile by userId
 type UserProfileResponse = {

@@ -1,5 +1,5 @@
-/* navbar.css */
 .navbar {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,4 +66,120 @@
   margin-right: 1rem;
   margin-left: 15px;
   margin-top: 5px;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 75px;
+  right: 230px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  isolation: isolate;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-message {
+  font-size: 14px;
+  margin: 0 0 5px;
+}
+
+.notification-date {
+  font-size: 12px;
+  color: gray;
+}
+
+.notification-error {
+  color: red;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.no-notifications {
+  padding: 10px;
+  font-size: 14px;
+  color: gray;
+  text-align: center;
+}
+
+/* Search Dropdown */
+.search-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 90px;
+  width: 100%;
+  max-width: 260px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1050;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-item:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.search-profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.search-username {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.no-search-results {
+  padding: 10px;
+  text-align: center;
+  color: #888;
+}
+
+.accept-friend-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.accept-friend-button:hover {
+  background-color: #45a049;
 }

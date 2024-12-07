@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./register.css";
 import logo from "../../assets/images/vibez_logo.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
-import { emailVerificationRequest } from "../../api/emailVerificationRequest.ts";
+import { emailVerificationRequest } from "../../api/Users/emailVerificationRequest.ts";
 
 export const EmailVerification = () => {
   const [otp, setOtp] = useState("");

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './createPost.css';
-import { createPost } from '../../api/createPost.ts';
+import { createPost } from '../../api/Posts/createPost.ts';
 
 type CreatePostProps = {
   token: string;
