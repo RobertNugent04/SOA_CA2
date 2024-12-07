@@ -355,6 +355,7 @@ export const Messages: React.FC<MessagesProps> = ({
       </div>
 
       <div className="messages-list">
+      <div ref={messagesEndRef} />
         {loading ? (
           <p>Loading messages...</p>
         ) : error ? (
@@ -376,7 +377,6 @@ export const Messages: React.FC<MessagesProps> = ({
             </div>
           ))
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <div style={{ display: "none" }}>
