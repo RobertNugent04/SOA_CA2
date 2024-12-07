@@ -23,3 +23,6 @@ wwwroot/posts-images/
 #Publish profiles
 .config/
 Properties/
+
+#wwwroot
+wwwroot/
