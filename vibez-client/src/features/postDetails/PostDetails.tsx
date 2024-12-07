@@ -96,6 +96,7 @@ export const PostDetails = ({ postId, token }) => {
     const response = await createCommentRequest(payload, token);
 
     if (response.success) {
+      console.log("Comment recieved successfully:", response);
       // Append the new comment to the comments array
       setComments((prevComments) => [
         ...prevComments,
@@ -173,13 +174,13 @@ export const PostDetails = ({ postId, token }) => {
         {comments.map((comment) => (
           <div key={comment.commentId} className="comment-item">
             <img
-              src={comment.user?.profilePic || "https://via.placeholder.com/40"}
-              alt={comment.user?.name || "User"}
+              src={getPostImageUrl(comment.profilePicturePath) || "https://via.placeholder.com/40"}
+              alt={comment?.userName || "User"}
               className="comment-profile-pic"
             />
             <div className="comment-content-wrapper">
               <div className="comment-author-date">
-                <span className="comment-author">{comment.user?.name || "Anonymous"}</span>
+                <span className="comment-author">{comment.userName}</span>
                 <span className="comment-date">
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </span>
