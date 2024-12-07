@@ -38,7 +38,7 @@ export const HomeRoute: React.FC = () => {
           <Posts isUserPage={false} userId={currentUserId ? currentUserId : 0} token={token} />
         </div>
         <div className="messages-container">
-          <MessageTab currentUserId={currentUserId} />
+          <MessageTab currentUserId={currentUserId ?? 0} token={token}/>
         </div>
       </div>
     </div>
