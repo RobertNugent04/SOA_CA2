@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './navbar.css';
 import logo from '../../assets/images/vibez_logo.jpg';
 import bell from '../../assets/images/notification_bell.png';
-import search from '../../assets/images/search_icon.png';
-import profilePic from '../../assets/images/default_pfp.png';
-import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts'; 
+import searchIcon from '../../assets/images/search_icon.png';
+import defaultProfilePic from '../../assets/images/default_pfp.png';
+import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts';
+import { searchRequest } from '../../api/Users/searchRequest.ts'; 
 
 type NavbarProps = {
   currentUserId: number | null;
-  token: string | null; // Add token as a prop
+  token: string | null;
 };
 
 export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate(); // Hook for navigation
+
+  // Fetch notifications
   const fetchNotifications = async () => {
     if (!token) {
       setError('No token provided');
@@ -35,10 +42,49 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
     }
   };
 
+  // Toggle notifications dropdown
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
-    if (!notifications.length) fetchNotifications(); // Fetch notifications if not already fetched
+    if (!notifications.length) fetchNotifications(); // Fetch only if not already fetched
   };
+
+  // Handle search input changes
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.length === 0) {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    try {
+      const results = await searchRequest(query); // Call search API
+      setSearchResults(results);
+      setShowSearchDropdown(true);
+    } catch (err) {
+      console.error('Error fetching search results:', err);
+      setSearchResults([]);
+    }
+  };
+
+  // Navigate to user's profile when a search result is clicked
+  const handleResultClick = (otherUserId: number) => {
+    navigate('/other-user', {
+      state: { userId: currentUserId, token, otherUserId }, // Pass required state
+    });
+
+    setShowSearchDropdown(false); // Close dropdown after navigation
+    setSearchQuery(''); // Clear the search bar
+  };
+
+  // Close search dropdown on click outside (optional enhancement)
+  useEffect(() => {
+    const closeDropdown = () => setShowSearchDropdown(false);
+    window.addEventListener('click', closeDropdown);
+    return () => window.removeEventListener('click', closeDropdown);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -48,7 +94,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
         </Link>
       </div>
       <div className="navbar-right">
-        <div className="navbar-icon" onClick={toggleNotifications}>
+        {/* Notifications Icon */}
+        <div className="navbar-icon" onClick={(e) => {
+          e.stopPropagation(); // Prevent closing dropdown due to window click
+          toggleNotifications();
+        }}>
           <img src={bell} alt="notification bell" className="bell" />
           {showNotifications && (
             <div className="notifications-dropdown">
@@ -70,16 +120,51 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
             </div>
           )}
         </div>
+
+        {/* Search Bar */}
         <div className="navbar-search">
-          <img src={search} alt="search icon" className="navbar-icon-image" />
-          <input type="text" placeholder="Search" className="navbar-search-input" />
+          <img src={searchIcon} alt="search icon" className="navbar-icon-image" />
+          <input
+            type="text"
+            placeholder="Search"
+            className="navbar-search-input"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onClick={(e) => e.stopPropagation()} // Prevent closing dropdown
+          />
+          {showSearchDropdown && (
+            <div className="search-dropdown">
+              {searchResults.length > 0 ? (
+                <div className="search-results">
+                  {searchResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className="search-item"
+                      onClick={() => handleResultClick(result.userId)} // Navigate to the user's profile
+                    >
+                      <img
+                        src={result.profilePic || defaultProfilePic}
+                        alt={result.userName}
+                        className="search-profile-pic"
+                      />
+                      <span className="search-username">{result.userName}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-search-results">No results found.</p>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* Profile Picture */}
         <div className="navbar-profile">
           <Link
             to="/user"
             state={{ token, userId: currentUserId }}
           >
-            <img src={profilePic} alt="Profile" className="navbar-profile-pic" />
+            <img src={defaultProfilePic} alt="Profile" className="navbar-profile-pic" />
           </Link>
         </div>
       </div>
