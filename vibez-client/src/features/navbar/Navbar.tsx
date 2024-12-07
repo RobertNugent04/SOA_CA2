@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './navbar.css';
 import logo from '../../assets/images/vibez_logo.jpg';
 import bell from '../../assets/images/notification_bell.png';
 import search from '../../assets/images/search_icon.png';
 import profilePic from '../../assets/images/default_pfp.png';
+import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts'; 
 
 type NavbarProps = {
   currentUserId: number | null;
@@ -12,8 +13,32 @@ type NavbarProps = {
 };
 
 export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  console.log("Navbar token: ", token);
+  const fetchNotifications = async () => {
+    if (!token) {
+      setError('No token provided');
+      return;
+    }
+
+    try {
+      const response = await getNotificationsRequest(token);
+      if (response.success) {
+        setNotifications(response.data);
+      } else {
+        setError(response.error || 'Failed to fetch notifications.');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching notifications.');
+    }
+  };
+
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+    if (!notifications.length) fetchNotifications(); // Fetch notifications if not already fetched
+  };
 
   return (
     <nav className="navbar">
@@ -23,8 +48,27 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
         </Link>
       </div>
       <div className="navbar-right">
-        <div className="navbar-icon">
+        <div className="navbar-icon" onClick={toggleNotifications}>
           <img src={bell} alt="notification bell" className="bell" />
+          {showNotifications && (
+            <div className="notifications-dropdown">
+              {error && <p className="notification-error">{error}</p>}
+              {notifications.length > 0 ? (
+                <div className="notifications-list">
+                  {notifications.map((notification) => (
+                    <div key={notification.notificationId} className="notification-item">
+                      <p className="notification-message">{notification.message}</p>
+                      <span className="notification-date">
+                        {new Date(notification.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-notifications">No notifications available.</p>
+              )}
+            </div>
+          )}
         </div>
         <div className="navbar-search">
           <img src={search} alt="search icon" className="navbar-icon-image" />
@@ -33,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
         <div className="navbar-profile">
           <Link
             to="/user"
-            state={{token, userId: currentUserId }} 
+            state={{ token, userId: currentUserId }}
           >
             <img src={profilePic} alt="Profile" className="navbar-profile-pic" />
           </Link>
