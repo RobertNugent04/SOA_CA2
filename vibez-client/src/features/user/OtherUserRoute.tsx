@@ -1,13 +1,13 @@
-import React from 'react';
-import { Posts } from '../posts/Posts.tsx';
-import { Navbar } from '../navbar/Navbar.tsx';
-import { MessageTab } from '../messageTab/MessageTab.tsx';
-import { UserCard } from './OtherUserCard.tsx';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import { Posts } from "../posts/Posts.tsx";
+import { Navbar } from "../navbar/Navbar.tsx";
+import { MessageTab } from "../messageTab/MessageTab.tsx";
+import { UserCard } from "./OtherUserCard.tsx";
+import { useLocation } from "react-router-dom";
 
 export const OtherUserRoute: React.FC = () => {
   const location = useLocation();
-  const { userId, token, otherUserId} = location.state || {}; 
+  const { userId, token, otherUserId } = location.state || {};
 
   console.log("User Route token: ", token);
 
@@ -22,13 +22,17 @@ export const OtherUserRoute: React.FC = () => {
       <Navbar token={token} currentUserId={otherUserId} />
       <div className="content-wrapper">
         <div className="posts-container">
-          <UserCard token={token} userId={otherUserId} /> 
+          <UserCard token={token} userId={otherUserId} />
           <div className="posts">
-            <Posts isUserPage={true} userId={otherUserId.toString()} token={token} /> 
+            <Posts
+              isUserPage={true}
+              userId={otherUserId.toString()}
+              token={token}
+            />
           </div>
         </div>
         <div className="messages-container">
-          <MessageTab currentUserId={otherUserId} /> 
+          <MessageTab currentUserId={otherUserId} token={token} />
         </div>
       </div>
     </div>
