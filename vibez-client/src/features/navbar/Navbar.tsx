@@ -35,7 +35,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
 
     try {
       const response = await getNotificationsRequest(token);
+      
       if (response.success) {
+        console.log('Notifications:', response.data);
         setNotifications(response.data);
       } else {
         setError(response.error || 'Failed to fetch notifications.');
@@ -90,9 +92,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
     setSearchQuery('');
   };
 
-  // Toggle notifications dropdown visibility
+  // Toggle notifications dropdown
   const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
+    setShowNotifications((prev) => !prev);
+    if (!notifications.length) fetchNotifications(); // Fetch only if not already fetched
   };
 
   const getImageUrl = (imageUrl: string | null) =>
@@ -107,7 +110,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       </div>
       <div className="navbar-right">
         {/* Notifications Icon */}
-        <div className="navbar-icon" onClick={toggleNotifications}>
+        <div className="navbar-icon" onClick={(e) => {
+          e.stopPropagation(); // Prevent closing dropdown due to window click
+          toggleNotifications();
+        }}>
           <img src={bell} alt="notification bell" className="bell" />
           {showNotifications && (
             <div className="notifications-dropdown">
