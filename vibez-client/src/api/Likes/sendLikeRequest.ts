@@ -14,6 +14,10 @@ export const likePostRequest = async (
       body: JSON.stringify(payload),
     });
 
+    if(response.ok) {
+        console.log('Post liked successfully');
+        }
+
     if (!response.ok) {
       const errorData = await response.json();
       return { success: false, error: errorData.message || "Failed to like post." };

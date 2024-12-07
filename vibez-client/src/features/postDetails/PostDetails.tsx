@@ -9,6 +9,7 @@ import blue_like from "../../assets/images/blue_like.png";
 import { getPostRequest } from "../../api/Posts/getPostRequest.ts";
 import { createCommentRequest } from "../../api/Comments/createCommentRequest.ts";
 import { getCommentsRequest } from "../../api/Comments/getCommentsRequest.ts"; // Import API to fetch comments
+import { likePostRequest } from "../../api/Likes/sendLikeRequest.ts"; // Import the like API
 import API_BASE_URL from "../../api/apiConsts.ts";
 
 export const PostDetails = ({ postId, token }) => {
@@ -29,6 +30,8 @@ export const PostDetails = ({ postId, token }) => {
         const response = await getPostRequest(postId, token);
         if (response.success) {
           setPost(response.data);
+          setLikes({ [postId]: 0 }); // Initialize likes count
+          setLikeImages({ [postId]: black_like }); // Default like image
         } else {
           setError(response.error || "Failed to fetch post.");
         }
@@ -50,29 +53,40 @@ export const PostDetails = ({ postId, token }) => {
         if (response.success) {
           setComments(response.data); // Populate comments from API
         } else {
-          console.error('Failed to fetch comments:', response.error);
+          console.error("Failed to fetch comments:", response.error);
         }
       } catch (err) {
-        console.error('An error occurred while fetching comments:', err);
+        console.error("An error occurred while fetching comments:", err);
       }
     };
-  
+
     fetchComments();
   }, [postId, token]);
-  
 
-  const handleLike = (postId: number) => {
-    setLikes((prevLikes) => ({
-      ...prevLikes,
-      [postId]: (prevLikes[postId] || 0) + 1,
-    }));
-    setLikeImages((prevLikeImages) => ({
-      ...prevLikeImages,
-      [postId]:
-        (prevLikeImages[postId] || black_like) === black_like
-          ? blue_like
-          : black_like,
-    }));
+  const handleLike = async (postId: number) => {
+    try {
+      // Make the API request to like the post
+      const response = await likePostRequest({ postId }, token);
+
+      if (response.success) {
+        // Update the UI based on like status
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          [postId]: (prevLikes[postId] || 0) + 1,
+        }));
+        setLikeImages((prevLikeImages) => ({
+          ...prevLikeImages,
+          [postId]:
+            (prevLikeImages[postId] || black_like) === black_like
+              ? blue_like
+              : black_like,
+        }));
+      } else {
+        console.error("Failed to like post:", response.error);
+      }
+    } catch (error) {
+      console.error("An error occurred while liking the post:", error);
+    }
   };
 
   const handleCommentSubmit = async () => {
@@ -86,7 +100,7 @@ export const PostDetails = ({ postId, token }) => {
       setComments((prevComments) => [
         ...prevComments,
         {
-          commentId: response.data?.id || Date.now(), // Use server ID if available
+          commentId: response.data.id,
           postId,
           content: commentText,
           createdAt: new Date().toISOString(),
@@ -108,7 +122,7 @@ export const PostDetails = ({ postId, token }) => {
   if (!post) return <div>Post not found.</div>;
 
   if (goBack) {
-    return <Posts />;
+    return <Posts isUserPage={false} userId={0} token={token} />;
   }
 
   return (
