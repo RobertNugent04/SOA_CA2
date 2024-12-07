@@ -36,6 +36,11 @@
         public string? ProfilePicturePath { get; set; }
 
         /// <summary>
+        /// The number of likes the post has.
+        /// </summary>
+        public int LikesCount { get; set; }
+
+        /// <summary>
         /// The timestamp when the post was created UTC.
         /// </summary>
         public DateTime CreatedAt { get; set; }

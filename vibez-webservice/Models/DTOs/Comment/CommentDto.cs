@@ -29,5 +29,15 @@
         /// The ID of the post the comment belongs to.
         /// </summary>
         public int PostId { get; set; }
+
+        /// <summary>
+        /// The username of the user who created the post.
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// The profile picture path of the user who created the post.
+        /// </summary>
+        public string? ProfilePicturePath { get; set; }
     }
 }
