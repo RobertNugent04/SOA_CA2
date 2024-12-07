@@ -37,6 +37,7 @@ namespace SOA_CA2.Repositories
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .Include(p => p.User)
+                    .Include(p => p.Likes)
                     .ToListAsync();
 
                 _logger.LogInformation("Fetched {Count} posts for page {PageNumber}.", posts.Count, pageNumber);
@@ -61,6 +62,7 @@ namespace SOA_CA2.Repositories
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .Include(p => p.User)
+                    .Include(p => p.Likes)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -76,7 +78,7 @@ namespace SOA_CA2.Repositories
             try
             {
                 _logger.LogInformation("Fetching post by ID: {PostId}", postId);
-                return await _context.Posts.Where(p => p.PostId == postId).Include(p => p.User).FirstOrDefaultAsync();
+                return await _context.Posts.Where(p => p.PostId == postId).Include(p => p.User).Include(p => p.Likes).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
