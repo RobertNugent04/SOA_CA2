@@ -55,4 +55,10 @@ export const NOTIFICATION_API = {
 
 };
 
+export const MESSAGE_API = {
+
+    GET_CONVERSATION: (friendId: number) => `${API_BASE_URL}/api/messages/conversation/${friendId}`,
+
+};
+
 

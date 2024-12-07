@@ -23,7 +23,6 @@ export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) 
       setError(null);
 
       try {
-
         console.log("currentUserId: ", currentUserId);
         console.log("token: ", token);
         const response = await getProfileRequest(token, currentUserId);
@@ -81,7 +80,13 @@ export const MessageTab: React.FC<MessageTabProps> = ({ currentUserId, token }) 
         </div>
       ) : (
         // Render the Messages component for the selected user
-        <Messages currentUserId={currentUserId} otherUserId={selectedUserId} />
+        <Messages 
+          currentUserId={currentUserId} 
+          otherUserId={selectedUserId} 
+          token={token} 
+          // Pass the list of friends as users
+          users={friends}  
+        />
       )}
     </div>
   );
