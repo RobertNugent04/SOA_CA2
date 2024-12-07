@@ -38,13 +38,32 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                // Validate input
+                if (dto.FriendId <= 0)
+                {
+                    _logger.LogWarning("Invalid FriendId in friend request.");
+                    return BadRequest(new { Error = "Invalid FriendId." });
+                }
+
+                if (dto.FriendId == userId)
+                {
+                    _logger.LogWarning("User attempted to send a friend request to themselves.");
+                    return BadRequest(new { Error = "You cannot send a friend request to yourself." });
+                }
+
                 await _friendshipService.SendFriendRequestAsync(userId, dto);
                 return Ok(new { Message = "Friend request sent successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Friend request failed validation.");
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending friend request.");
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
 
@@ -60,13 +79,25 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                if (friendId <= 0)
+                {
+                    _logger.LogWarning("Invalid FriendId in accept request.");
+                    return BadRequest(new { Error = "Invalid FriendId." });
+                }
+
                 await _friendshipService.UpdateFriendshipStatusAsync(userId, friendId, "Accepted");
                 return Ok(new { Message = "Friend request accepted." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Error accepting friend request.");
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error accepting friend request.");
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
 
@@ -82,13 +113,25 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                if (friendId <= 0)
+                {
+                    _logger.LogWarning("Invalid FriendId in reject request.");
+                    return BadRequest(new { Error = "Invalid FriendId." });
+                }
+
                 await _friendshipService.UpdateFriendshipStatusAsync(userId, friendId, "Rejected");
                 return Ok(new { Message = "Friend request rejected." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Error rejecting friend request.");
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error rejecting friend request.");
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
 
@@ -106,6 +149,13 @@ namespace SOA_CA2.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                if (friendId <= 0)
+                {
+                    _logger.LogWarning("Invalid FriendId in status request.");
+                    return BadRequest(new { Error = "Invalid FriendId." });
+                }
+
                 string? friendshipStatus = await _friendshipService.GetFriendshipStatusAsync(userId, friendId);
                 return Ok(new { Status = friendshipStatus });
             }

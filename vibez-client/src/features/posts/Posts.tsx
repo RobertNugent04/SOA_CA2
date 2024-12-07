@@ -29,6 +29,7 @@ type Post = {
   userName: string;
   profilePicturePath: string | null;
   createdAt: string;
+  likesCount: number;
 };
 
 type Friend = {
@@ -51,7 +52,9 @@ type PostsProps = {
 };
 
 export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
-  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(
+    null
+  );
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<{ [key: number]: string }>({});
   const [likes, setLikes] = useState<{ [key: number]: number }>({});
@@ -74,13 +77,28 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
             const profileData = response.data!;
             setPosts(profileData.posts); // Set user posts for user page
             setUserProfile(profileData);
+
+            // Initialize likes state
+            const initialLikes = profileData.posts.reduce(
+              (acc, post) => ({ ...acc, [post.postId]: post.likesCount }),
+              {}
+            );
+            setLikes(initialLikes);
           } else {
             setError(response.error || "Failed to fetch user posts.");
           }
         } else {
           response = await getFeedRequest(token);
           if (response.success) {
-            setPosts(response.data || []);
+            const postsData = response.data || [];
+            setPosts(postsData);
+
+            // Initialize likes state
+            const initialLikes = postsData.reduce(
+              (acc, post) => ({ ...acc, [post.postId]: post.likesCount }),
+              {}
+            );
+            setLikes(initialLikes);
           } else {
             setError(response.error || "Failed to fetch activity feed.");
           }
@@ -117,7 +135,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
   const handleProfileClick = (userId: number) => {
     // Navigate to the UserRoute for the clicked user
     const otherUserId = userId;
-    navigate(`/other-user`, { state: { userId, token, otherUserId} });
+    navigate(`/other-user`, { state: { userId, token, otherUserId } });
   };
 
   return (
@@ -135,7 +153,7 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
                 src={getPostImageUrl(post.profilePicturePath) || ""}
                 alt={`Post by user ${post.userId}`}
                 className="post-profile-pic"
-                onClick={() => handleProfileClick(post.userId)} 
+                onClick={() => handleProfileClick(post.userId)}
               />
               <div className="post-author-date">
                 <span className="post-author">{post.userName}</span>
@@ -170,31 +188,28 @@ export const Posts: React.FC<PostsProps> = ({ isUserPage, userId, token }) => {
                 src={send}
                 alt="Send"
                 className="send-button"
-                onClick={() => console.log(`Comment sent for post ${post.postId}`)}
+                onClick={() =>
+                  console.log(`Comment sent for post ${post.postId}`)
+                }
               />
             </div>
             <div
               className="like-button"
-              onClick={() =>
+              onClick={() => {
                 setLikes((prev) => ({
                   ...prev,
-                  [post.postId]: (prev[post.postId] || 0) + 1,
-                }))
-              }
+                  [post.postId]: (prev[post.postId] || 0) + 1, // Increment likes
+                }));
+                setLikeImages((prev) => ({
+                  ...prev,
+                  [post.postId]:
+                    (prev[post.postId] || black_like) === black_like
+                      ? blue_like
+                      : black_like, // Toggle like image
+                }));
+              }}
             >
-              <img
-                src={likeImages[post.postId] || black_like}
-                alt="Like"
-                onClick={() =>
-                  setLikeImages((prev) => ({
-                    ...prev,
-                    [post.postId]:
-                      (prev[post.postId] || black_like) === black_like
-                        ? blue_like
-                        : black_like,
-                  }))
-                }
-              />
+              <img src={likeImages[post.postId] || black_like} alt="Like" />
               {likes[post.postId] || 0}
             </div>
           </div>

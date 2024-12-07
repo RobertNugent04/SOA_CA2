@@ -36,7 +36,7 @@ namespace SOA_CA2.Infrastructure
             CreateMap<PostCreationDto, Post>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-            CreateMap<Post, PostDTO>();
+            //CreateMap<Post, PostDTO>();
 
             CreateMap<PostUpdateDto, Post>();
 
@@ -44,13 +44,24 @@ namespace SOA_CA2.Infrastructure
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
                 .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                .ForMember(dest => dest.ProfilePicturePath, opt => opt.MapFrom(src => src.User.ProfilePicturePath))
+                .ForMember(dest => dest.LikesCount, opt => opt.MapFrom(src => src.Likes.Count))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
             // **Comment Mappings**
             CreateMap<CommentCreationDto, Comment>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-            CreateMap<Comment, CommentDto>();
+            //CreateMap<Comment, CommentDto>();
+
+            CreateMap<Comment, CommentDto>()
+                .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.PostId))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                .ForMember(dest => dest.ProfilePicturePath, opt => opt.MapFrom(src => src.User.ProfilePicturePath));
 
             CreateMap<CommentUpdateDto, Comment>();
 

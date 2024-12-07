@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOA_CA2.Infrastructure;
 using SOA_CA2.Interfaces;
 using SOA_CA2.Models;
 using SOA_CA2.Models.DTOs.Notification;
@@ -21,6 +22,7 @@ namespace SOA_CA2.Tests
         private readonly Mock<ILogger<PostService>> _loggerMock;
         private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly PostService _postService;
+        private readonly IMapper _mapper;
 
         public PostServiceTests()
         {
@@ -28,11 +30,9 @@ namespace SOA_CA2.Tests
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<PostService>>();
             _notificationServiceMock = new Mock<INotificationService>();
-            _postService = new PostService(
-                _unitOfWorkMock.Object,
-                _mapperMock.Object,
-                _loggerMock.Object,
-                _notificationServiceMock.Object);
+            MapperConfiguration config = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
+            _mapper = config.CreateMapper();
+            _postService = new PostService(_unitOfWorkMock.Object, _mapper, _loggerMock.Object, _notificationServiceMock.Object);    
         }
 
         [Fact]
@@ -120,7 +120,22 @@ namespace SOA_CA2.Tests
                 UserId = 1,
                 Content = "Specific Post Content",
                 ImageUrl = "/posts-images/specific.jpg",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                User = new User
+                {
+                    UserId = 1,
+                    UserName = "TestUser",
+                    ProfilePicturePath = "/profile-pictures/testuser.jpg",
+                    FullName = "John Doe",
+                    Email = "johndoe@example.com",
+                    PasswordHash = "hashedpassword123",
+                    CreatedAt = DateTime.UtcNow,
+                },
+                Likes = new List<Like>
+                {
+                    new Like { LikeId = 1, UserId = 2, PostId = postId },
+                    new Like { LikeId = 2, UserId = 3, PostId = postId }
+                }
             };
 
             _unitOfWorkMock.Setup(u => u.Posts.GetPostByIdAsync(postId)).ReturnsAsync(post);
@@ -131,6 +146,11 @@ namespace SOA_CA2.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(postId, result.PostId);
+            Assert.Equal("Specific Post Content", result.Content);
+            Assert.Equal("/posts-images/specific.jpg", result.ImageUrl);
+            Assert.Equal("TestUser", result.UserName);
+            Assert.Equal("/profile-pictures/testuser.jpg", result.ProfilePicturePath);
+            Assert.Equal(2, result.LikesCount);
         }
 
         [Fact]

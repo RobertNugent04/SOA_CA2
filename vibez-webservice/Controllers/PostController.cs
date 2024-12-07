@@ -49,15 +49,19 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Retrieves all posts for the authenticated user with pagination.
+        /// Retrieves all posts for the userId with pagination.
         /// </summary>
         [AuthorizeUser]
-        [HttpGet("user-posts")]
-        public async Task<IActionResult> GetPosts(int pageNumber = 1, int pageSize = 10)
+        [HttpGet("user-posts/{userId}")]
+        public async Task<IActionResult> GetPosts(int userId, int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                int userId = GetUserIdFromToken();
+                if (userId <= 0)
+                {
+                    _logger.LogWarning("Invalid userId in status request.");
+                    return BadRequest(new { Error = "Invalid userId." });
+                }
                 IEnumerable<PostDTO> posts = await _postService.GetPostsAsync(userId, pageNumber, pageSize);
                 return Ok(posts);
             }
@@ -92,7 +96,7 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Creates a new post.
+        /// Creates a new post with an optional image.
         /// </summary>
         [AuthorizeUser]
         [HttpPost]
@@ -100,11 +104,26 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
-                string? imagePath = SaveImage(Request.Form.Files["ImageFile"], "posts-images");
+                string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
                 await _postService.CreatePostAsync(userId, dto, imagePath);
                 return Ok(new { Message = "Post created successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid image file.");
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,7 +133,7 @@ namespace SOA_CA2.Controllers
         }
 
         /// <summary>
-        /// Updates an existing post.
+        /// Updates an existing post with optional content and image update.
         /// </summary>
         [AuthorizeUser]
         [HttpPut("{postId}")]
@@ -122,8 +141,18 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Validate content
+                if (!string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    dto.Content = dto.Content.Trim();
+                    if (dto.Content.Length > 500)
+                    {
+                        return BadRequest(new { Error = "Post content cannot exceed 500 characters." });
+                    }
+                }
+
                 int userId = GetUserIdFromToken();
-                string? imagePath = SaveImage(Request.Form.Files["ImageFile"], "posts-images");
+                string? imagePath = SaveImage(Request.Form.Files["ImageUrl"], "posts-images");
 
                 await _postService.UpdatePostAsync(userId, postId, dto, imagePath);
                 return Ok(new { Message = "Post updated successfully." });
@@ -132,9 +161,14 @@ namespace SOA_CA2.Controllers
             {
                 return Unauthorized(new { Error = ex.Message });
             }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid image file.");
+                return BadRequest(new { Error = ex.Message });
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating post ID: {PostId}", postId);
+                _logger.LogError(ex, "Error updating post.");
                 return StatusCode(500, new { Error = ex.Message });
             }
         }
@@ -183,18 +217,25 @@ namespace SOA_CA2.Controllers
         {
             if (file == null) return null;
 
-            string[] allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
             string fileExtension = Path.GetExtension(file.FileName).ToLower();
 
             if (!allowedExtensions.Contains(fileExtension))
             {
-                throw new ArgumentException("Invalid file type.");
+                throw new ArgumentException("Invalid file type. Only .jpg, .jpeg, .png, and .gif are allowed.");
+            }
+
+            // Validate file size
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
+            if (file.Length > maxFileSize)
+            {
+                throw new ArgumentException("File size exceeds the maximum limit of 10MB.");
             }
 
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder);
             Directory.CreateDirectory(uploadsFolder);
 
-            string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+            string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (FileStream fileStream = new FileStream(filePath, FileMode.Create))

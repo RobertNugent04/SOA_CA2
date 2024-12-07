@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './navbar.css';
-import logo from '../../assets/images/vibez_logo.jpg';
-import bell from '../../assets/images/notification_bell.png';
-import searchIcon from '../../assets/images/search_icon.png';
-import defaultProfilePic from '../../assets/images/default_pfp.png';
-import { getNotificationsRequest } from '../../api/Notifications/getNotificationsRequest.ts';
-import { searchRequest } from '../../api/Users/searchRequest.ts';
-import { getUserProfileRequest } from '../../api/Users/userProfileRequest.ts'; 
-import { acceptFriendshipRequest } from '../../api/Friends/acceptFriendRequest.ts'; 
-import API_BASE_URL from '../../api/apiConsts.ts';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./navbar.css";
+import logo from "../../assets/images/vibez_logo.jpg";
+import bell from "../../assets/images/notification_bell.png";
+import searchIcon from "../../assets/images/search_icon.png";
+import defaultProfilePic from "../../assets/images/default_pfp.png";
+import { getNotificationsRequest } from "../../api/Notifications/getNotificationsRequest.ts";
+import { searchRequest } from "../../api/Users/searchRequest.ts";
+import { getUserProfileRequest } from "../../api/Users/userProfileRequest.ts";
+import { acceptFriendshipRequest } from "../../api/Friends/acceptFriendRequest.ts";
+import { PostDetails } from "../postDetails/PostDetails.tsx";
+import API_BASE_URL from "../../api/apiConsts.ts";
 
 type NavbarProps = {
   currentUserId: number | null;
@@ -21,16 +22,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [profilePic, setProfilePic] = useState<string | null>(null); 
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
   const navigate = useNavigate();
 
   // Fetch notifications
   const fetchNotifications = async () => {
     if (!token) {
-      setError('No token provided');
+      setError("No token provided");
       return;
     }
 
@@ -38,13 +40,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       const response = await getNotificationsRequest(token);
 
       if (response.success) {
-        console.log('Notifications:', response.data);
+        console.log("Notifications:", response.data);
         setNotifications(response.data);
       } else {
-        setError(response.error || 'Failed to fetch notifications.');
+        setError(response.error || "Failed to fetch notifications.");
       }
     } catch (err) {
-      setError('An error occurred while fetching notifications.');
+      setError("An error occurred while fetching notifications.");
     }
   };
 
@@ -54,15 +56,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       alert("Error: Invalid friend request.");
       return;
     }
-  
+
     if (!token) {
       setError("No token provided");
       return;
     }
-  
+
     try {
       const response = await acceptFriendshipRequest(token, friendId);
-  
+
       if (response.success) {
         setNotifications((prev) =>
           prev.filter((notif) => notif.friendId !== friendId)
@@ -74,7 +76,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       console.error("Error accepting friend request:", err);
     }
   };
-  
 
   // Fetch user profile picture
   useEffect(() => {
@@ -106,19 +107,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
       setSearchResults(results);
       setShowSearchDropdown(true);
     } catch (err) {
-      console.error('Error fetching search results:', err);
+      console.error("Error fetching search results:", err);
       setSearchResults([]);
     }
   };
 
   // Navigate to user's profile when a search result is clicked
   const handleResultClick = (otherUserId: number) => {
-    navigate('/other-user', {
+    navigate("/other-user", {
       state: { userId: currentUserId, token, otherUserId },
     });
 
     setShowSearchDropdown(false);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   // Toggle notifications dropdown
@@ -129,6 +130,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
 
   const getImageUrl = (imageUrl: string | null) =>
     imageUrl ? `${API_BASE_URL}${imageUrl}` : undefined;
+
+  // Navigate to a post or reset view
+  const navigateToPost = (postId: number) => {
+    setSelectedPostId(postId);
+  };
+
+  if (selectedPostId !== null) {
+    return <PostDetails postId={selectedPostId} token={token} />;
+  }
 
   return (
     <nav className="navbar">
@@ -152,18 +162,36 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
               {notifications.length > 0 ? (
                 <div className="notifications-list">
                   {notifications.map((notification) => (
-                    <div key={notification.notificationId} className="notification-item">
-                      <p className="notification-message">{notification.message}</p>
+                    <div
+                      key={notification.notificationId}
+                      className="notification-item"
+                    >
+                      <p className="notification-message">
+                        {notification.message}
+                      </p>
                       <span className="notification-date">
                         {new Date(notification.createdAt).toLocaleString()}
                       </span>
-                      {/* Add button to accept friend request if notification type is FriendRequest */}         
-                      {notification.type === 'FriendRequest' && (
+                      {/* Add button to accept friend request if notification type is FriendRequest */}
+                      {notification.type === "FriendRequest" && (
                         <button
                           className="accept-friend-button"
-                          onClick={() => handleAcceptFriendRequest(notification.senderId)}
+                          onClick={() =>
+                            handleAcceptFriendRequest(notification.senderId)
+                          }
                         >
                           Accept
+                        </button>
+                      )}
+                      {(notification.type === "Post" ||
+                        notification.type === "Comment") && (
+                        <button
+                          className="view-post-button"
+                          onClick={() =>
+                            navigateToPost(notification.referenceId)
+                          }
+                        >
+                          View Post
                         </button>
                       )}
                     </div>
@@ -178,7 +206,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUserId, token }) => {
 
         {/* Search Bar */}
         <div className="navbar-search">
-          <img src={searchIcon} alt="search icon" className="navbar-icon-image" />
+          <img
+            src={searchIcon}
+            alt="search icon"
+            className="navbar-icon-image"
+          />
           <input
             type="text"
             placeholder="Search"

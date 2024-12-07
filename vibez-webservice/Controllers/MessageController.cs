@@ -4,6 +4,7 @@ using SOA_CA2.Models.DTOs.Message;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using SOA_CA2.Middleware;
+using System.Text.RegularExpressions;
 
 namespace SOA_CA2.Controllers
 {
@@ -37,6 +38,35 @@ namespace SOA_CA2.Controllers
         {
             try
             {
+                // Input validation
+                if (dto == null)
+                {
+                    _logger.LogWarning("Message creation DTO is null.");
+                    return BadRequest(new { Error = "Message content cannot be empty." });
+                }
+
+                dto.Content = dto.Content?.Trim();
+                if (string.IsNullOrWhiteSpace(dto.Content))
+                {
+                    _logger.LogWarning("Message content is empty.");
+                    return BadRequest(new { Error = "Message content cannot be empty." });
+                }
+
+                if (dto.Content.Length > 1000)
+                {
+                    _logger.LogWarning("Message content exceeds the maximum length.");
+                    return BadRequest(new { Error = "Message content cannot exceed 1000 characters." });
+                }
+
+                if (!IsValidMessageContent(dto.Content))
+                {
+                    _logger.LogWarning("Message content contains invalid characters.");
+                    return BadRequest(new { Error = "Message content contains invalid characters." });
+                }
+
+                // Sanitize content
+                dto.Content = SanitizeInput(dto.Content);
+
                 int senderId = GetUserIdFromToken();
                 await _messageService.SendMessageAsync(senderId, dto);
                 return Ok(new { Message = "Message sent successfully." });
@@ -146,6 +176,23 @@ namespace SOA_CA2.Controllers
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
             return userId;
+        }
+
+        /// <summary>
+        /// Validates message content to allow only safe characters.
+        /// </summary>
+        private bool IsValidMessageContent(string content)
+        {
+            string pattern = @"^[\w\s.,!?@#%&*()\-+=:;/'""\[\]{}<>|\\]*$"; // Allow common alphanumeric and punctuation
+            return Regex.IsMatch(content, pattern);
+        }
+
+        /// <summary>
+        /// Sanitizes input by removing or encoding potentially malicious characters.
+        /// </summary>
+        private string SanitizeInput(string input)
+        {
+            return input.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&#39;");
         }
     }
 }
